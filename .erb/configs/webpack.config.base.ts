@@ -2,10 +2,10 @@
  * Base webpack config used across other specific configs
  */
 
-import webpack from 'webpack'
-import TsconfigPathsPlugins from 'tsconfig-paths-webpack-plugin'
-import webpackPaths from './webpack.paths'
-import { dependencies as externals } from '../../release/app/package.json'
+import webpack from 'webpack';
+import TsconfigPathsPlugins from 'tsconfig-paths-webpack-plugin';
+import webpackPaths from './webpack.paths';
+import { dependencies as externals } from '../../release/app/package.json';
 
 const configuration: webpack.Configuration = {
   externals: [...Object.keys(externals || {})],
@@ -54,6 +54,6 @@ const configuration: webpack.Configuration = {
       NODE_ENV: 'production',
     }),
   ],
-}
+};
 
-export default configuration
+export default configuration;
