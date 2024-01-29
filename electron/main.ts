@@ -1,4 +1,5 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import fs from 'fs';
 import path from 'node:path';
 
 // The built directory structure
@@ -59,3 +60,12 @@ app.on('activate', () => {
 });
 
 app.whenReady().then(createWindow);
+
+ipcMain.handle('post/round', (event, args) => {
+  try {
+    fs.writeFileSync('./src/data/rounds.json', JSON.stringify(args));
+    return true;
+  } catch (err) {
+    return false;
+  }
+});
