@@ -75,7 +75,7 @@ export function Payballs() {
         </ActionIcon>
       </Group>
       <Box p="lg" bg="dark.8">
-        <Title>Gross</Title>
+        <Title>Gross Payballs</Title>
         <Group align="flex-start" justify="space-around">
           {payballTables
             .filter((table) => table.scoreType === ScoreType.GROSS)
@@ -83,7 +83,7 @@ export function Payballs() {
         </Group>
       </Box>
       <Box p="lg" bg="dark.8">
-        <Title>Net</Title>
+        <Title>Net Payballs</Title>
         <Group align="flex-start" justify="space-around">
           {payballTables
             .filter((table) => table.scoreType === ScoreType.NET)

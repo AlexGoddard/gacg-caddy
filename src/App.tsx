@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AppShell } from '@mantine/core';
+import { AppShell, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
 import { Dashboard } from 'components/dashboard/Dashboard';
+import { Deuces } from 'components/deuces/Deuces';
 import { Header } from 'components/header/Header';
 import { Navbar } from 'components/navbar/Navbar';
 import { Payballs } from 'components/payballs/Payballs';
@@ -29,14 +30,17 @@ function App() {
         <AppShell.Header>
           <Header toggle={toggle} setActiveRoute={setActiveRoute} />
         </AppShell.Header>
-        <AppShell.Navbar p="md">
+        <AppShell.Navbar>
           <Navbar activeRoute={activeRoute} setActiveRoute={setActiveRoute} />
         </AppShell.Navbar>
         <AppShell.Main>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/payballs" element={<Payballs />} />
-          </Routes>
+          <ScrollArea.Autosize>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/payballs" element={<Payballs />} />
+              <Route path="/deuces" element={<Deuces />} />
+            </Routes>
+          </ScrollArea.Autosize>
         </AppShell.Main>
       </AppShell>
     </BrowserRouter>

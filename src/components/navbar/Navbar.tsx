@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { NavLink } from '@mantine/core';
-import { IconCurrencyDollar, IconHome } from '@tabler/icons-react';
+import { IconCurrencyDollar, IconHome, IconPlayCard } from '@tabler/icons-react';
 
 interface NavbarProps {
   activeRoute: number;
@@ -13,6 +13,7 @@ export function Navbar(props: NavbarProps) {
   const navLinks = [
     { icon: IconHome, href: '/', label: 'Dashboard' },
     { icon: IconCurrencyDollar, href: '/payballs', label: 'Payballs' },
+    { icon: IconPlayCard, href: '/deuces', label: 'Deuces' },
   ];
 
   const links = navLinks.map((link, index) => (

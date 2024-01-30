@@ -21,6 +21,11 @@ interface Payballs {
   payballs: Payball[];
 }
 
+interface Deuce {
+  player: string;
+  hole: number;
+}
+
 class Rounds {
   private static _instance: Rounds;
   private rounds;
@@ -53,6 +58,20 @@ class Rounds {
       });
     });
     return payballs;
+  }
+
+  public getAllDeuces(day: string) {
+    const deuces: Deuce[] = [];
+    const dayRounds = this.rounds.filter((round) => round.day === day);
+    if (dayRounds.length === 0) return [];
+    dayRounds.map((round) => {
+      round.grossHoles.map((score, holeIndex) => {
+        if (score <= 2) {
+          deuces.push({ player: players.getPlayerName(round.playerId), hole: holeIndex + 1 });
+        }
+      });
+    });
+    return deuces;
   }
 
   private getPayballs(day: string, scoreType: ScoreType, division: Division) {
