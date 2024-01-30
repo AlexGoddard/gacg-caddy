@@ -1,75 +1,57 @@
-import {
-  Badge,
-  Button,
-  Fieldset,
-  Grid,
-  Group,
-  SimpleGrid,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { Badge, Button, Fieldset, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconArrowRight, IconGolf } from '@tabler/icons-react';
 
-import {
-  DaySelector,
-  HoleInput,
-  PlayerInput,
-} from 'components/common/form-inputs';
+import { DaySelector, HoleInput, PlayerInput } from 'components/common/form-inputs';
 import { SplitData } from 'components/common/data-display';
-import { DEFAULT_GRADIENT } from 'components/constants';
+import { DEFAULT_GRADIENT, TournamentDay } from 'components/constants';
 import * as notifications from 'components/notifications';
-import {
-  getGross,
-  getIn,
-  getNet,
-  getOut,
-  getTournamentDay,
-} from 'components/util';
+import { getGross, getIn, getNet, getOut, getTournamentDay } from 'components/util';
 import { holes } from 'data/holes';
 import { players } from 'data/players';
 import { rounds } from 'data/rounds';
 
 import './style.less';
 
+interface NewRoundFormData {
+  playerId: number;
+  day: TournamentDay;
+  grossHoles: Array<number>;
+}
+
 export function NewRound({ closeModal }) {
   const form = useForm({
     initialValues: {
-      player: null,
+      playerId: null,
       day: getTournamentDay(),
       grossHoles: new Array(18).fill({ score: '' }),
     },
 
     validate: {
-      player: (value) => (value != null ? null : 'Player is required'),
+      playerId: (value) => (value != null ? null : 'Player is required'),
       grossHoles: {
         score: (value) => (Number(value) > 0 ? null : true),
       },
     },
 
     transformValues: (values) => ({
-      lastName: values.player ? players.getLastName(values.player) : null,
-      firstName: values.player ? players.getFirstName(values.player) : null,
+      playerId: Number(values.playerId),
       day: values.day,
       grossHoles: values.grossHoles.map((hole) => Number(hole.score)),
     }),
   });
 
-  const onSubmit = async (data) => {
-    const id = notifications.loading(
-      'Adding round..',
-      `Player: ${data.player}`,
-    );
+  const onSubmit = async (data: NewRoundFormData) => {
+    const player = players.getPlayerName(data.playerId);
+    const id = notifications.loading('Adding round..', `Player: ${player}`);
 
     rounds
       .saveRound({
-        lastName: data.lastName,
-        firstName: data.firstName,
+        playerId: data.playerId,
         day: data.day,
         grossHoles: data.grossHoles,
       })
       .then((saveResult) => {
-        const player = `${data.firstName} ${data.lastName}`;
         if (saveResult === true) {
           const message = `Saved round for ${player}`;
           notifications.updateSuccess(id, message);
@@ -85,7 +67,7 @@ export function NewRound({ closeModal }) {
     <HoleInput
       key={`hole-${index + 1}-input`}
       hole={{
-        number: holes.getNumbers()[index],
+        holeNumber: holes.getNumbers()[index],
         par: holes.getPars()[index],
         handicap: holes.getHandicaps()[index],
       }}
@@ -94,22 +76,19 @@ export function NewRound({ closeModal }) {
   ));
 
   return (
-    <form
-      onSubmit={form.onSubmit((values) => onSubmit(values))}
-      onReset={form.onReset}
-    >
+    <form onSubmit={form.onSubmit((values) => onSubmit(values))} onReset={form.onReset}>
       <Stack>
         <DaySelector {...form.getInputProps('day')} />
         <Fieldset legend="Player Info">
           <Group>
-            <PlayerInput {...form.getInputProps('player')} />
-            {form.values.player && (
+            <PlayerInput {...form.getInputProps('playerId')} />
+            {form.values.playerId && (
               <>
                 <Badge variant="gradient" gradient={DEFAULT_GRADIENT}>
-                  Division: {players.getDivision(form.values.player)}
+                  Division: {players.getDivision(form.getTransformedValues().playerId)}
                 </Badge>
                 <Badge variant="gradient" gradient={DEFAULT_GRADIENT}>
-                  Handicap: {players.getHandicap(form.values.player)}
+                  Handicap: {players.getHandicap(form.getTransformedValues().playerId)}
                 </Badge>
               </>
             )}
@@ -143,7 +122,7 @@ export function NewRound({ closeModal }) {
                 <SplitData
                   topSection={getNet(
                     form.getTransformedValues().grossHoles,
-                    players.getHandicap(form.values.player!),
+                    players.getHandicap(form.getTransformedValues().playerId),
                   )}
                   bottomSection="Net"
                 />

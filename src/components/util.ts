@@ -1,24 +1,24 @@
+import { TournamentDay } from './constants';
+
 export function getTournamentDay() {
   const currentDate = new Date();
   switch (currentDate.getDay()) {
     case 0:
-      return 'sunday';
+      return TournamentDay.SUNDAY;
     case 6:
-      return 'saturday';
+      return TournamentDay.SATURDAY;
     default:
-      return 'friday';
+      return TournamentDay.FRIDAY;
   }
 }
 
-export function getTournamentYear(): number {
+export const getTournamentYear = () => {
   const currentDate = new Date();
   return currentDate.getFullYear();
-}
+};
 
-const getScore = (holes: Array<number>, start?: number, end?: number) => {
-  return holes
-    .slice(start, end)
-    .reduce((accumulator, current) => accumulator + current, 0);
+export const getFullName = (firstName: string, lastName: string) => {
+  return `${firstName} ${lastName}`;
 };
 
 export const getOut = (holes: Array<number>) => {
@@ -35,4 +35,8 @@ export const getGross = (holes: Array<number>) => {
 
 export const getNet = (holes: Array<number>, handicap: number) => {
   return getGross(holes) - handicap;
+};
+
+const getScore = (holes: Array<number>, start?: number, end?: number) => {
+  return holes.slice(start, end).reduce((sum, current) => sum + current, 0);
 };

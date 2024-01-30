@@ -1,6 +1,8 @@
+import { Division } from 'components/constants';
 import playerData from './players.json';
 
 interface Player {
+  id: number;
   lastName: string;
   firstName: string;
   division: string;
@@ -19,34 +21,27 @@ class Players {
     return this._instance || (this._instance = new this());
   }
 
-  public getNames(division?: string) {
-    let names = this.players;
+  public getPlayers(division?: Division) {
+    let players = this.players;
     if (division !== undefined) {
-      names = names.filter((player) => player.division === division);
+      players = players.filter((player) => player.division === division);
     }
-    return names.map((player) => `${player.firstName} ${player.lastName}`);
+    return players;
   }
 
-  public getDivision(name: string): string {
-    const division = this.players.find(
-      (player) => `${player.firstName} ${player.lastName}` === name,
-    )?.division;
+  public getDivision(playerId: number) {
+    const division = this.players.find((player) => player.id === playerId)?.division;
     return division !== undefined ? division : 'N/A';
   }
 
-  public getHandicap(name: string): number {
-    const handicap = this.players.find(
-      (player) => `${player.firstName} ${player.lastName}` === name,
-    )?.handicap;
+  public getHandicap(playerId: number) {
+    const handicap = this.players.find((player) => player.id === playerId)?.handicap;
     return handicap !== undefined ? handicap : 0;
   }
 
-  public getFirstName(name: string): string {
-    return name.split(' ')[0].trim();
-  }
-
-  public getLastName(name: string): string {
-    return name.split(' ')[1].trim();
+  public getPlayerName(playerId: number) {
+    const player = this.players.find((player) => player.id === playerId);
+    return player !== undefined ? `${player.firstName} ${player.lastName}` : '';
   }
 }
 

@@ -1,6 +1,8 @@
 import { ActionIcon, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
+
+import { DEFAULT_GRADIENT } from 'components/constants';
 import { NewRound, NewRoundTitle } from 'components/round/NewRound';
 
 export function Dashboard() {
@@ -22,7 +24,7 @@ export function Dashboard() {
         variant="gradient"
         size="xl"
         aria-label="Add new round"
-        gradient={{ from: 'indigo', to: 'teal', deg: 150 }}
+        gradient={DEFAULT_GRADIENT}
         onClick={open}
       >
         <IconPlus />

@@ -1,18 +1,35 @@
-import { Chip, Group, NumberInput, Paper, Select, Stack } from '@mantine/core';
+import {
+  Chip,
+  ChipGroupProps,
+  Group,
+  NumberInput,
+  NumberInputProps,
+  Paper,
+  Select,
+  SelectProps,
+  Stack,
+} from '@mantine/core';
+import { Division, TournamentDay } from 'components/constants';
+import { getFullName } from 'components/util';
+import { Hole } from 'data/holes';
 
 import { players } from 'data/players';
 
-export const DaySelector = (props) => {
+interface HoleInputProps extends NumberInputProps {
+  hole: Hole;
+}
+
+export const DaySelector = (props: ChipGroupProps) => {
   return (
     <Chip.Group {...props}>
       <Group justify="left">
-        <Chip variant="light" value="friday">
+        <Chip variant="light" value={TournamentDay.FRIDAY}>
           Friday
         </Chip>
-        <Chip variant="light" value="saturday">
+        <Chip variant="light" value={TournamentDay.SATURDAY}>
           Saturday
         </Chip>
-        <Chip variant="light" value="sunday">
+        <Chip variant="light" value={TournamentDay.SUNDAY}>
           Sunday
         </Chip>
       </Group>
@@ -20,13 +37,13 @@ export const DaySelector = (props) => {
   );
 };
 
-export const HoleInput = (props) => {
+export const HoleInput = (props: HoleInputProps) => {
   const { hole, ...otherProps } = props;
   return (
     <Stack gap="0" justify="flex-start" align="center" className="hole">
       <NumberInput
         {...otherProps}
-        label={hole.number}
+        label={hole.holeNumber}
         hideControls
         classNames={{ input: 'holeInput' }}
         min={1}
@@ -40,7 +57,8 @@ export const HoleInput = (props) => {
   );
 };
 
-export const PlayerInput = (props) => {
+export const PlayerInput = (props: SelectProps) => {
+  const playerList = players.getPlayers();
   return (
     <Select
       aria-label="Player select"
@@ -48,11 +66,25 @@ export const PlayerInput = (props) => {
       data={[
         {
           group: 'A Division',
-          items: players.getNames('A'),
+          items: playerList
+            .filter((player) => player.division === Division.A)
+            .map((player) => {
+              return {
+                value: player.id.toString(),
+                label: getFullName(player.firstName, player.lastName),
+              };
+            }),
         },
         {
           group: 'B Division',
-          items: players.getNames('B'),
+          items: playerList
+            .filter((player) => player.division === Division.B)
+            .map((player) => {
+              return {
+                value: player.id.toString(),
+                label: getFullName(player.firstName, player.lastName),
+              };
+            }),
         },
       ]}
       comboboxProps={{
