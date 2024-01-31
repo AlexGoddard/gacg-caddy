@@ -8,12 +8,19 @@ import {
   Select,
   SelectProps,
   Stack,
+  Text,
+  rem,
 } from '@mantine/core';
+import { IconCurrencyDollar } from '@tabler/icons-react';
+
 import { Division, TournamentDay } from 'components/constants';
 import { getFullName } from 'components/util';
 import { Hole } from 'data/holes';
-
 import { players } from 'data/players';
+
+interface PrizePoolInputProps extends NumberInputProps {
+  labelId: string;
+}
 
 interface HoleInputProps extends NumberInputProps {
   hole: Hole;
@@ -37,6 +44,32 @@ export const DaySelector = (props: ChipGroupProps) => {
   );
 };
 
+export const PrizePoolInput = (props: PrizePoolInputProps) => {
+  const { labelId, ...otherProps } = props;
+  return (
+    <>
+      <Text id={labelId}>Prize Pool</Text>
+      <NumberInput
+        {...otherProps}
+        aria-labelledby={labelId}
+        hideControls
+        placeholder="enter amount"
+        size="md"
+        leftSection={
+          <IconCurrencyDollar style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
+        }
+        min={1}
+        clampBehavior="strict"
+        allowDecimal={false}
+        allowNegative={false}
+        thousandSeparator=","
+        onFocus={(e) => e.target.select()}
+        classNames={{ input: 'prizePoolInput' }}
+      />
+    </>
+  );
+};
+
 export const HoleInput = (props: HoleInputProps) => {
   const { hole, ...otherProps } = props;
   return (
@@ -45,12 +78,13 @@ export const HoleInput = (props: HoleInputProps) => {
         {...otherProps}
         label={hole.holeNumber}
         hideControls
-        classNames={{ input: 'holeInput' }}
         min={1}
         max={99}
+        clampBehavior="strict"
         allowNegative={false}
         allowDecimal={false}
         onFocus={(e) => e.target.select()}
+        classNames={{ input: 'holeInput' }}
       />
       <Paper className="holeInfo">{hole.par}</Paper>
     </Stack>

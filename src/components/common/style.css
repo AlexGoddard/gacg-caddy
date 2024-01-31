@@ -1,3 +1,40 @@
+.hole {
+  text-align: center;
+}
+
+.holeInput {
+  width: 2ch !important;
+  padding: 0px 10px !important;
+  text-align: center !important;
+  border-radius: 0px !important;
+  font-size: var(--mantine-font-size-md) !important;
+  box-sizing: content-box;
+}
+
+.holeInfo {
+  width: 100%;
+  border: 1px solid var(--mantine-color-dark-5);
+  border-top: none;
+  font-size: var(--mantine-font-size-xs);
+  cursor: default;
+  border-radius: 0 !important;
+  color: var(--mantine-color-green-7);
+}
+
+.splitData {
+  border: 1px var(--mantine-color-dark-5) solid;
+  border-radius: 4px;
+  overflow: hidden;
+  text-align: center;
+  cursor: default;
+  font-size: var(--mantine-font-size-lg);
+}
+
+.splitDataBottom {
+  border-radius: 0 0 4px 4px !important;
+  background: var(--mantine-color-dark-6) !important;
+}
+
 .titledTable {
   text-align: left;
   width: fit-content;

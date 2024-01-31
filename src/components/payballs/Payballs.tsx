@@ -4,7 +4,7 @@ import { ActionIcon, Box, Group, Stack, Title } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 
 import { TitledTable } from 'components/common/data-display';
-import { DaySelector } from 'components/common/form-inputs';
+import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
 import { getTournamentDay, getTournamentYear } from 'components/util';
 import { rounds } from 'data/rounds';
@@ -13,6 +13,7 @@ import './style.less';
 
 export function Payballs() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
+  const [prizePool, setPrizePool] = useState<string | number>(100);
 
   const payballs = rounds.getAllPayballs(tournamentDay);
 
@@ -59,6 +60,18 @@ export function Payballs() {
     });
   };
 
+  const numGrossPayballs = payballTableData
+    .filter((payball) => payball.scoreType === ScoreType.GROSS)
+    .reduce((sum, current) => sum + current.elementData.body.length, 0);
+  const numNetPayballs = payballTableData
+    .filter((payball) => payball.scoreType === ScoreType.NET)
+    .reduce((sum, current) => sum + current.elementData.body.length, 0);
+  // Prizes are given in $5 increments
+  const grossPayballValue =
+    Math.floor(Number(prizePool) / (numGrossPayballs > 0 ? numGrossPayballs : 1) / 5) * 5;
+  const netPayballValue =
+    Math.floor(Number(prizePool) / (numNetPayballs > 0 ? numNetPayballs : 1) / 5) * 5;
+
   return (
     <Stack>
       <Group justify="space-between">
@@ -66,17 +79,26 @@ export function Payballs() {
           value={tournamentDay}
           onChange={(day) => setTournamentDay(day as TournamentDay)}
         />
-        <ActionIcon
-          variant="gradient"
-          aria-label="Download payballs"
-          gradient={DEFAULT_GRADIENT}
-          onClick={downloadPayballs}
-        >
-          <IconDownload />
-        </ActionIcon>
+        <Group>
+          <PrizePoolInput labelId="payballsPrizePool" value={prizePool} onChange={setPrizePool} />
+          <ActionIcon
+            variant="gradient"
+            aria-label="Download payballs"
+            gradient={DEFAULT_GRADIENT}
+            onClick={downloadPayballs}
+          >
+            <IconDownload />
+          </ActionIcon>
+        </Group>
       </Group>
       <Box p="lg" bg="dark.8">
-        <Title>Gross Payballs</Title>
+        <Stack gap={0}>
+          <Title>Gross Payballs</Title>
+          <Title c="indigo" order={3}>
+            ($
+            {grossPayballValue})
+          </Title>
+        </Stack>
         <Group align="flex-start" justify="space-around">
           {payballTables
             .filter((table) => table.scoreType === ScoreType.GROSS)
@@ -84,7 +106,13 @@ export function Payballs() {
         </Group>
       </Box>
       <Box p="lg" bg="dark.8">
-        <Title>Net Payballs</Title>
+        <Stack gap={0}>
+          <Title>Net Payballs</Title>
+          <Title c="indigo" order={3}>
+            ($
+            {netPayballValue})
+          </Title>
+        </Stack>
         <Group align="flex-start" justify="space-around">
           {payballTables
             .filter((table) => table.scoreType === ScoreType.NET)

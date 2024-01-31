@@ -22,7 +22,7 @@ export const Scorecard = (props: ScorecardProps) => {
     const scoreElements = scores.map((holeScore, holeIndex) => (
       <Table.Td key={`${name}-hole-${holeIndex + 1}-score`}>
         {isPlayerScore && data.teamScores[holeIndex] === holeScore ? (
-          <Indicator size={4} color="green.7">
+          <Indicator size={4} color="green.7" zIndex={99}>
             {holeScore}
           </Indicator>
         ) : (

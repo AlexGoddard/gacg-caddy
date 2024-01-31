@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AppShell, ScrollArea } from '@mantine/core';
+import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
 import { Calcutta } from 'components/calcutta/Calcutta';
@@ -35,14 +35,12 @@ function App() {
           <Navbar activeRoute={activeRoute} setActiveRoute={setActiveRoute} />
         </AppShell.Navbar>
         <AppShell.Main>
-          <ScrollArea.Autosize>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/payballs" element={<Payballs />} />
-              <Route path="/deuces" element={<Deuces />} />
-              <Route path="/calcutta" element={<Calcutta />} />
-            </Routes>
-          </ScrollArea.Autosize>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/payballs" element={<Payballs />} />
+            <Route path="/deuces" element={<Deuces />} />
+            <Route path="/calcutta" element={<Calcutta />} />
+          </Routes>
         </AppShell.Main>
       </AppShell>
     </BrowserRouter>
