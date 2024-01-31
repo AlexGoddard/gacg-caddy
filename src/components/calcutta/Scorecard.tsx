@@ -4,15 +4,23 @@ import { ScorecardProps } from './Calcutta';
 
 export const Scorecard = (props: ScorecardProps) => {
   const { data, ...otherProps } = props;
-  const holeHeaders = holes.getNumbers().map((holeNumber) => <Table.Td>{holeNumber}</Table.Td>);
-  const holePars = holes.getPars().map((par) => <Table.Td c="green">{par}</Table.Td>);
-  const holeHandicaps = holes
-    .getHandicaps()
-    .map((handicap) => <Table.Td c="red">{handicap}</Table.Td>);
+  const holeHeaders = holes
+    .getNumbers()
+    .map((holeNumber) => <Table.Td key={`hole-${holeNumber}-number`}>{holeNumber}</Table.Td>);
+  const holePars = holes.getPars().map((par, holeIndex) => (
+    <Table.Td key={`hole-${holeIndex + 1}-par`} c="green">
+      {par}
+    </Table.Td>
+  ));
+  const holeHandicaps = holes.getHandicaps().map((handicap, holeIndex) => (
+    <Table.Td key={`hole-${holeIndex + 1}-handicap`} c="red">
+      {handicap}
+    </Table.Td>
+  ));
 
   const scoreRows = (name: string, scores: number[], isPlayerScore = true) => {
     const scoreElements = scores.map((holeScore, holeIndex) => (
-      <Table.Td>
+      <Table.Td key={`${name}-hole-${holeIndex + 1}-score`}>
         {isPlayerScore && data.teamScores[holeIndex] === holeScore ? (
           <Indicator size={4} color="green.7">
             {holeScore}
@@ -23,7 +31,7 @@ export const Scorecard = (props: ScorecardProps) => {
       </Table.Td>
     ));
     return (
-      <Table.Tr>
+      <Table.Tr key={`${name}-table-row`}>
         <Table.Td className="leftLabel">{name}</Table.Td>
         {scoreElements.slice(0, 9)}
         <Table.Td>{scores.slice(0, 9).reduce((sum, current) => sum + current, 0)}</Table.Td>

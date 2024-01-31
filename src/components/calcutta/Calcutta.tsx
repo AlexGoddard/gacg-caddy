@@ -163,7 +163,7 @@ export function Calcutta() {
   const calcuttaTables = Object.values(ScoreType).map((scoreType) => {
     const title = `${scoreType} Calcutta${isSample ? ' Sample' : ''}`;
     return (
-      <Stack p="lg" bg="dark.8">
+      <Stack key={`${scoreType}-calcutta-table`} p="lg" bg="dark.8">
         <Title tt="capitalize">{title}</Title>
         <DataTable
           ta="left"
@@ -215,7 +215,6 @@ export function Calcutta() {
         <DaySelector
           value={tournamentDay}
           onChange={(day) => {
-            console.log(grossExpandedRecordIds[0]);
             collapseExpandedRows();
             setTournamentDay(day as TournamentDay);
           }}
