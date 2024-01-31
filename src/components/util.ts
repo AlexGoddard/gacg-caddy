@@ -37,6 +37,6 @@ export const getNet = (holes: Array<number>, handicap: number) => {
   return getGross(holes) - handicap;
 };
 
-const getScore = (holes: Array<number>, start?: number, end?: number) => {
+export const getScore = (holes: number[], start?: number, end?: number) => {
   return holes.slice(start, end).reduce((sum, current) => sum + current, 0);
 };

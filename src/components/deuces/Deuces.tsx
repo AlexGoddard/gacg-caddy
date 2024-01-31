@@ -7,7 +7,7 @@ import { DEFAULT_GRADIENT, TournamentDay } from 'components/constants';
 import { getTournamentDay, getTournamentYear } from 'components/util';
 import { rounds } from 'data/rounds';
 
-import './styles.less';
+import './style.less';
 
 export function Deuces() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());

@@ -1,4 +1,5 @@
 import { Division } from 'components/constants';
+
 import playerData from './players.json';
 
 interface Player {

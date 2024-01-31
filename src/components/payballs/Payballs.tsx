@@ -9,7 +9,7 @@ import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants
 import { getTournamentDay, getTournamentYear } from 'components/util';
 import { rounds } from 'data/rounds';
 
-import './styles.less';
+import './style.less';
 
 export function Payballs() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
@@ -33,6 +33,7 @@ export function Payballs() {
       division: payballData.division,
       element: (
         <TitledTable
+          key={`${payballData.scoreType}-${payballData.division}-payball-table`}
           title={`${payballData.division.toUpperCase()} Division`}
           data={payballData.elementData}
         />

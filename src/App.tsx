@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppShell, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
+import { Calcutta } from 'components/calcutta/Calcutta';
 import { Dashboard } from 'components/dashboard/Dashboard';
 import { Deuces } from 'components/deuces/Deuces';
 import { Header } from 'components/header/Header';
@@ -39,6 +40,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/payballs" element={<Payballs />} />
               <Route path="/deuces" element={<Deuces />} />
+              <Route path="/calcutta" element={<Calcutta />} />
             </Routes>
           </ScrollArea.Autosize>
         </AppShell.Main>

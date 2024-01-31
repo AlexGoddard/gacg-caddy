@@ -1,5 +1,8 @@
 import { ReactNode } from 'react';
 import { Paper, Stack, StackProps, Table, TableProps, Title } from '@mantine/core';
+import { DataTable, DataTableProps } from 'mantine-datatable';
+
+import './style.css';
 
 interface SplitDataProps extends StackProps {
   topSection: ReactNode;
@@ -26,7 +29,7 @@ export const TitledTable = (props: TitledTableProps) => {
   return (
     <Stack>
       <Title order={3}>{title}</Title>
-      <Table className="payballTable" data={data} {...otherProps} />
+      <Table className="titledTable" data={data} {...otherProps} />
     </Stack>
   );
 };

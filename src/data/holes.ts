@@ -18,6 +18,10 @@ class Holes {
     return this._instance || (this._instance = new this());
   }
 
+  public getHoles() {
+    return this.holes;
+  }
+
   public getNumbers() {
     return this.holes.map((hole) => hole.holeNumber);
   }

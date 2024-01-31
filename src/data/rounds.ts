@@ -1,7 +1,16 @@
-import { Division, ScoreType } from 'components/constants';
+import { Division, ScoreType, TournamentDay } from 'components/constants';
 import { holes } from './holes';
 import { players } from './players';
+
+import calcuttaData from './calcutta-teams.json';
 import roundData from './rounds.json';
+
+export interface CalcuttaTeam {
+  a: CalcuttaPlayerData;
+  b: CalcuttaPlayerData;
+  gross: number[];
+  net: number[];
+}
 
 interface Round {
   playerId: number;
@@ -26,6 +35,12 @@ interface Deuce {
   hole: number;
 }
 
+interface CalcuttaPlayerData {
+  id: number;
+  gross: number[];
+  net: number[];
+}
+
 class Rounds {
   private static _instance: Rounds;
   private rounds;
@@ -46,7 +61,7 @@ class Rounds {
     return saveResult;
   }
 
-  public getAllPayballs(day: string) {
+  public getAllPayballs(day: TournamentDay) {
     const payballs: Payballs[] = [];
     Object.values(ScoreType).forEach((scoreType) => {
       Object.values(Division).forEach((division) => {
@@ -60,7 +75,7 @@ class Rounds {
     return payballs;
   }
 
-  public getAllDeuces(day: string) {
+  public getAllDeuces(day: TournamentDay) {
     const deuces: Deuce[] = [];
     const dayRounds = this.rounds.filter((round) => round.day === day);
     if (dayRounds.length === 0) return [];
@@ -74,7 +89,42 @@ class Rounds {
     return deuces;
   }
 
-  private getPayballs(day: string, scoreType: ScoreType, division: Division) {
+  public getCalcutta(day: TournamentDay) {
+    const calcutta: CalcuttaTeam[] = [];
+    calcuttaData.calcuttaTeams.map((team) => {
+      const teamGrossRounds = this.rounds.filter(
+        (round) => round.day === day && [team.a, team.b].includes(round.playerId),
+      );
+      // Only include teams where both players have a recorded score
+      if (teamGrossRounds.length !== 2) return;
+      const teamNetRounds = teamGrossRounds.map((grossRound) => this.convertToNetRound(grossRound));
+
+      const holeNumbers = holes.getNumbers();
+      const grossTeamScores = holeNumbers.map((holeNumber) =>
+        this.getLowestScoreOnHole(holeNumber, teamGrossRounds),
+      );
+      const netTeamScores = holeNumbers.map((holeNumber) =>
+        this.getLowestScoreOnHole(holeNumber, teamNetRounds),
+      );
+      calcutta.push({
+        a: {
+          id: team.a,
+          gross: teamGrossRounds.find((round) => round.playerId === team.a)!.grossHoles,
+          net: teamNetRounds.find((round) => round.playerId === team.a)!.grossHoles,
+        },
+        b: {
+          id: team.b,
+          gross: teamGrossRounds.find((round) => round.playerId === team.b)!.grossHoles,
+          net: teamNetRounds.find((round) => round.playerId === team.b)!.grossHoles,
+        },
+        gross: grossTeamScores,
+        net: netTeamScores,
+      });
+    });
+    return calcutta;
+  }
+
+  private getPayballs(day: TournamentDay, scoreType: ScoreType, division: Division) {
     const payballs: Payball[] = [];
     let dayRounds = this.rounds.filter((round) => {
       const playerDivision = players.getDivision(round.playerId);
