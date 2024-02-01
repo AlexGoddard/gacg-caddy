@@ -1,4 +1,14 @@
-import { Badge, Button, Fieldset, Grid, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import {
+  Badge,
+  Button,
+  Fieldset,
+  Grid,
+  Group,
+  SimpleGrid,
+  Stack,
+  StackProps,
+  Text,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconArrowRight, IconGolf } from '@tabler/icons-react';
 
@@ -19,7 +29,12 @@ interface NewRoundFormData {
   grossHoles: Array<number>;
 }
 
-export function NewRound({ closeModal }) {
+interface NewRoundProps extends StackProps {
+  closeModal: () => void;
+}
+
+export function NewRound(props: NewRoundProps) {
+  const { closeModal, ...otherProps } = props;
   const form = useForm({
     initialValues: {
       playerId: null,
@@ -77,11 +92,11 @@ export function NewRound({ closeModal }) {
 
   return (
     <form onSubmit={form.onSubmit((values) => onSubmit(values))} onReset={form.onReset}>
-      <Stack>
+      <Stack {...otherProps}>
         <DaySelector {...form.getInputProps('day')} />
         <Fieldset legend="Player Info">
           <Group>
-            <PlayerInput {...form.getInputProps('playerId')} />
+            <PlayerInput data-autofocus {...form.getInputProps('playerId')} />
             {form.values.playerId && (
               <>
                 <Badge variant="gradient" gradient={DEFAULT_GRADIENT}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ActionIcon, Box, Group, Stack, Table, Title } from '@mantine/core';
+import { ActionIcon, Group, Stack, Table, Title } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
@@ -9,18 +9,22 @@ import { rounds } from 'data/rounds';
 
 import './style.less';
 
+const HEADERS = ['Player', 'Hole'];
+
 export function Deuces() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
   const [prizePool, setPrizePool] = useState<string | number>(100);
 
   const deuces = rounds.getAllDeuces(tournamentDay);
-  const deuceTableData = deuces.map((deuce) => [deuce.player, deuce.hole]);
+  const deuceTableData = deuces.map((deuce) => [deuce.player, deuce.hole.toString()]);
   // Prizes are given in $5 increments
   const deuceValue =
     Math.floor(Number(prizePool) / (deuceTableData.length > 0 ? deuceTableData.length : 1) / 5) * 5;
 
   const downloadDeuces = () => {
-    const deucesFile = new Blob([deuceTableData.map((row) => row.join(',')).join('\n')], {
+    const deucesFileData = [HEADERS];
+    deuceTableData.map((deuce) => deucesFileData.push(deuce));
+    const deucesFile = new Blob([deucesFileData.map((row) => row.join(',')).join('\n')], {
       type: 'text/csv',
     });
     const element = document.createElement('a');
@@ -48,22 +52,20 @@ export function Deuces() {
           </ActionIcon>
         </Group>
       </Group>
-      <Box p="lg" bg="dark.8">
-        <Stack gap={0}>
-          <Title>Deuces</Title>
-          <Title c="indigo" order={3}>
-            ($
-            {deuceValue})
-          </Title>
-        </Stack>
-        <Table
-          data={{
-            head: ['Player', 'Hole'],
-            body: deuceTableData,
-          }}
-          className="deuceTable"
-        />
-      </Box>
+      <Stack gap={0}>
+        <Title>Deuces</Title>
+        <Title c="indigo" order={3}>
+          ($
+          {deuceValue})
+        </Title>
+      </Stack>
+      <Table
+        data={{
+          head: HEADERS,
+          body: deuceTableData,
+        }}
+        className="deuceTable"
+      />
     </Stack>
   );
 }

@@ -1,12 +1,24 @@
 import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
-import { ActionIcon, Box, Group, Stack, TableProps, Title } from '@mantine/core';
-import { IconDownload, IconGolfOff } from '@tabler/icons-react';
+import {
+  ActionIcon,
+  Box,
+  Group,
+  GroupProps,
+  Paper,
+  Stack,
+  StackProps,
+  TableProps,
+  Text,
+  Title,
+} from '@mantine/core';
+import { IconDownload, IconGolfOff, IconTrophy } from '@tabler/icons-react';
 
 import { Scorecard } from './Scorecard';
-import { DaySelector } from 'components/common/form-inputs';
+import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
+import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
-import { getScore, getTournamentDay, getTournamentYear } from 'components/util';
+import { sum, getTournamentDay, getTournamentYear } from 'components/util';
 import { players } from 'data/players';
 import { CalcuttaTeam, rounds } from 'data/rounds';
 
@@ -40,68 +52,86 @@ interface CalcuttaTeamData {
   scorecardData: ScorecardData;
 }
 
+interface CalcuttaWinner {
+  aPlayer: string;
+  bPlayer: string;
+  score: number;
+  amount: number;
+  place: number;
+  scoreType: ScoreType;
+}
+
+interface Place {
+  number: number;
+  score: number;
+  winnings: number;
+  winners: string[];
+}
+
+interface PlaceProps extends Place, GroupProps {}
+
+interface PodiumProps extends StackProps {
+  places: Place[];
+}
+
+interface CalcuttaTableProps extends StackProps {
+  scoreType: ScoreType;
+  records: CalcuttaTeamData[];
+}
+
+const SAMPLE_HEADERS = [
+  'A Player',
+  'Handicap',
+  'Friday Gross',
+  'Friday Net',
+  'Saturday Gross',
+  'Saturday Net',
+  'B Player',
+  'Handicap',
+  'Friday Gross',
+  'Friday Net',
+  'Saturday Gross',
+  'Saturday Net',
+  'Team Friday Gross',
+  'Team Friday Net',
+  'Team Saturday Gross',
+  'Team Saturday Net',
+];
+
+const HEADERS = [
+  'A Player',
+  'Handicap',
+  'Gross',
+  'Net',
+  'B Player',
+  'Handicap',
+  'Gross',
+  'Net',
+  'Team Gross',
+  'Team Net',
+];
+
 export function Calcutta() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
-  const [grossExpandedRecordIds, setGrossExpandedRecordIds] = useState<string[]>([]);
-  const [netExpandedRecordIds, setNetExpandedRecordIds] = useState<string[]>([]);
-
-  const tableStates = {
-    gross: {
-      recordIds: grossExpandedRecordIds,
-      setExpandedRecordIds: setGrossExpandedRecordIds,
-    },
-    net: {
-      recordIds: netExpandedRecordIds,
-      setExpandedRecordIds: setNetExpandedRecordIds,
-    },
-  };
+  const [prizePool, setPrizePool] = useState<string | number>(5000);
 
   const isSample = tournamentDay !== TournamentDay.SUNDAY;
   const calcutta = rounds.getCalcutta(tournamentDay);
-
-  const collapseExpandedRows = () => {
-    setGrossExpandedRecordIds([]);
-    setNetExpandedRecordIds([]);
-  };
-
   const calcuttaTableData = getCalcuttaTableData(calcutta);
 
   const downloadCalcutta = () => {
-    const sampleHeaders = [
-      'A Player',
-      'Handicap',
-      'Friday Gross',
-      'Friday Net',
-      'Saturday Gross',
-      'Saturday Net',
-      'B Player',
-      'Handicap',
-      'Friday Gross',
-      'Friday Net',
-      'Saturday Gross',
-      'Saturday Net',
-      'Team Friday Gross',
-      'Team Friday Net',
-      'Team Saturday Gross',
-      'Team Saturday Net',
-    ];
-    const calcuttaHeaders = [
-      'A Player',
-      'Handicap',
-      'Gross',
-      'Net',
-      'B Player',
-      'Handicap',
-      'Gross',
-      'Net',
-      'Team Gross',
-      'Team Net',
-    ];
     const calcuttaFileData = [];
     if (isSample) {
-      const fridayCalcutta = rounds.getCalcutta(TournamentDay.FRIDAY);
-      const saturdayCalcutta = rounds.getCalcutta(TournamentDay.SATURDAY);
-      calcuttaFileData.push(sampleHeaders);
+      const fridayCalcutta =
+        tournamentDay === TournamentDay.FRIDAY
+          ? calcutta
+          : rounds.getCalcutta(TournamentDay.FRIDAY);
+      const saturdayCalcutta =
+        tournamentDay === TournamentDay.SATURDAY
+          ? calcutta
+          : rounds.getCalcutta(TournamentDay.SATURDAY);
+
+      calcuttaFileData.push(SAMPLE_HEADERS);
       fridayCalcutta.map((fridayCalcuttaTeam) => {
         const matchingSaturdayTeam = saturdayCalcutta.find(
           (saturdayCalcuttaTeam) => fridayCalcuttaTeam.a.id === saturdayCalcuttaTeam.a.id,
@@ -113,41 +143,41 @@ export function Calcutta() {
           // A Player
           players.getPlayerName(fridayCalcuttaTeam.a.id),
           players.getHandicap(fridayCalcuttaTeam.a.id),
-          getScore(fridayCalcuttaTeam.a.gross),
-          getScore(fridayCalcuttaTeam.a.net),
-          getScore(matchingSaturdayTeam.a.gross),
-          getScore(matchingSaturdayTeam.a.net),
+          sum(fridayCalcuttaTeam.a.gross),
+          sum(fridayCalcuttaTeam.a.net),
+          sum(matchingSaturdayTeam.a.gross),
+          sum(matchingSaturdayTeam.a.net),
           // B Player
           players.getPlayerName(fridayCalcuttaTeam.b.id),
           players.getHandicap(fridayCalcuttaTeam.b.id),
-          getScore(fridayCalcuttaTeam.b.gross),
-          getScore(fridayCalcuttaTeam.b.net),
-          getScore(matchingSaturdayTeam.b.gross),
-          getScore(matchingSaturdayTeam.b.net),
+          sum(fridayCalcuttaTeam.b.gross),
+          sum(fridayCalcuttaTeam.b.net),
+          sum(matchingSaturdayTeam.b.gross),
+          sum(matchingSaturdayTeam.b.net),
           // Team
-          getScore(fridayCalcuttaTeam.gross),
-          getScore(fridayCalcuttaTeam.net),
-          getScore(matchingSaturdayTeam.gross),
-          getScore(matchingSaturdayTeam.net),
+          sum(fridayCalcuttaTeam.gross),
+          sum(fridayCalcuttaTeam.net),
+          sum(matchingSaturdayTeam.gross),
+          sum(matchingSaturdayTeam.net),
         ]);
       });
     } else {
-      calcuttaFileData.push(calcuttaHeaders);
+      calcuttaFileData.push(HEADERS);
       calcutta.map((calcuttaTeam) =>
         calcuttaFileData.push([
           // A Player
           players.getPlayerName(calcuttaTeam.a.id),
           players.getHandicap(calcuttaTeam.a.id),
-          getScore(calcuttaTeam.a.gross),
-          getScore(calcuttaTeam.a.net),
+          sum(calcuttaTeam.a.gross),
+          sum(calcuttaTeam.a.net),
           // B Player
           players.getPlayerName(calcuttaTeam.b.id),
           players.getHandicap(calcuttaTeam.b.id),
-          getScore(calcuttaTeam.b.gross),
-          getScore(calcuttaTeam.b.net),
+          sum(calcuttaTeam.b.gross),
+          sum(calcuttaTeam.b.net),
           // Team
-          getScore(calcuttaTeam.gross),
-          getScore(calcuttaTeam.net),
+          sum(calcuttaTeam.gross),
+          sum(calcuttaTeam.net),
         ]),
       );
     }
@@ -160,89 +190,303 @@ export function Calcutta() {
     element.click();
   };
 
-  const calcuttaTables = Object.values(ScoreType).map((scoreType) => {
-    const title = `${scoreType} Calcutta${isSample ? ' Sample' : ''}`;
+  const getWinnings = (payouts: number[], teamsAlreadyPlaced: number, numTeams: number) => {
+    return sum(payouts.slice(teamsAlreadyPlaced, teamsAlreadyPlaced + numTeams)) / numTeams;
+  };
+
+  const getWinners = () => {
+    const winners: CalcuttaWinner[] = [];
+    const netPayouts = [0.2, 0.18, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
+    const grossPayouts = [0.12, 0.1, 0.05].map((percent) => percent * Number(prizePool));
+
+    // The number of teams who have already placed
+    let netPlaced = 0;
+    let grossPlaced = 0;
+
+    for (const netCalcuttaTeam of calcuttaTableData.net) {
+      if (winners.find((winning) => winning.aPlayer === netCalcuttaTeam.aPlayer)) continue;
+      if (netPlaced >= netPayouts.length) break;
+      const grossWinners: CalcuttaTeamData[] = [];
+
+      const possibleNetWinners = calcuttaTableData.net.filter(
+        (possibleMatch) => possibleMatch.score === netCalcuttaTeam.score,
+      );
+      // Determine if each team could win more going gross
+      possibleNetWinners.forEach((winner) => {
+        const remainingGrossTeams = calcuttaTableData.gross.filter((possibleMatch) =>
+          winners.find((winning) => winning.aPlayer === possibleMatch.aPlayer) ? false : true,
+        );
+        const winnerGrossScore = calcuttaTableData.gross.find(
+          (possibleMatch) => possibleMatch.aPlayer === winner.aPlayer,
+        )?.score;
+        remainingGrossTeams
+          .slice(0, grossPayouts.length - grossPlaced)
+          .forEach((remainingGrossTeam, index) => {
+            if (remainingGrossTeam.score === winnerGrossScore) {
+              const possibleGrossWinners = remainingGrossTeams.filter(
+                (possibleMatch) => possibleMatch.score === remainingGrossTeam.score,
+              );
+              const possibleNetPlaceWinnings = getWinnings(
+                netPayouts,
+                netPlaced,
+                possibleNetWinners.length,
+              );
+              const possibleGrossPlaceWinnings = getWinnings(
+                grossPayouts,
+                // Add index to account for teams that will
+                // place gross higher than the current team
+                grossPlaced + index,
+                possibleGrossWinners.length,
+              );
+              if (possibleGrossPlaceWinnings > possibleNetPlaceWinnings) {
+                grossWinners.push({ ...winner, ...{ score: winnerGrossScore } });
+              }
+            }
+          });
+      });
+
+      // Filter out teams that went gross
+      const netWinners = possibleNetWinners.filter((winner) =>
+        grossWinners.find((grossWinner) => grossWinner.aPlayer === winner.aPlayer) ? false : true,
+      );
+
+      grossWinners.map((winner) => {
+        winners.push({
+          aPlayer: winner.aPlayer,
+          bPlayer: winner.bPlayer,
+          score: winner.score,
+          amount: getWinnings(grossPayouts, grossPlaced, grossWinners.length),
+          place: grossPlaced + 1,
+          scoreType: ScoreType.GROSS,
+        });
+      });
+      grossPlaced += grossWinners.length;
+
+      netWinners.map((winner) => {
+        winners.push({
+          aPlayer: winner.aPlayer,
+          bPlayer: winner.bPlayer,
+          score: winner.score,
+          amount: getWinnings(netPayouts, netPlaced, netWinners.length),
+          place: netPlaced + 1,
+          scoreType: ScoreType.NET,
+        });
+      });
+      netPlaced += netWinners.length;
+    }
+
+    if (grossPlaced < grossPayouts.length) {
+      const remainingGrossTeams = calcuttaTableData.gross.filter((possibleMatch) =>
+        winners.find((winning) => winning.aPlayer === possibleMatch.aPlayer) ? false : true,
+      );
+      for (const grossTeam of remainingGrossTeams) {
+        if (winners.find((winning) => winning.aPlayer === grossTeam.aPlayer)) continue;
+        if (grossPlaced >= grossPayouts.length) break;
+
+        const grossWinners = calcuttaTableData.gross.filter(
+          (possibleMatch) => possibleMatch.score === grossTeam.score,
+        );
+        const grossWinnings = getWinnings(grossPayouts, grossPlaced, grossWinners.length);
+        grossWinners.map((winner) => {
+          winners.push({
+            aPlayer: winner.aPlayer,
+            bPlayer: winner.bPlayer,
+            score: winner.score,
+            amount: grossWinnings,
+            place: grossPlaced + 1,
+            scoreType: ScoreType.GROSS,
+          });
+        });
+        grossPlaced += grossWinners.length;
+      }
+    }
+    return winners;
+  };
+
+  const getPlaces = (scoreType: ScoreType, winners: CalcuttaWinner[]) => {
+    const availablePlaces = scoreType === ScoreType.NET ? [1, 2, 3, 4, 5] : [1, 2, 3];
+    return availablePlaces
+      .map((place) => {
+        const filteredWinners = winners.filter(
+          (winner) => winner.scoreType === scoreType && winner.place === place,
+        );
+        if (filteredWinners.length > 0) {
+          return {
+            number: place,
+            score: filteredWinners[0].score,
+            winnings: Math.floor(filteredWinners[0].amount / 5) * 5,
+            winners: filteredWinners.map((winner) => `${winner.aPlayer} & ${winner.bPlayer}`),
+          };
+        }
+      })
+      .filter((place): place is Place => !!place);
+  };
+
+  const Trophy = ({ place }: { place: number }) => {
+    const iconSize = '2.125rem';
+    const trophyClass = 'trophy';
+    switch (place) {
+      case 1:
+        return <IconTrophy size={iconSize} color="#FFD700" className={trophyClass} />;
+      case 2:
+        return <IconTrophy size={iconSize} color="#C0C0C0" className={trophyClass} />;
+      case 3:
+        return <IconTrophy size={iconSize} color="#CD7F32" className={trophyClass} />;
+      default:
+        return (
+          <Title order={2} className={trophyClass}>
+            {place}
+          </Title>
+        );
+    }
+  };
+
+  const Place = (props: PlaceProps) => {
+    const { number, score, winnings, winners, ...otherProps } = props;
+
     return (
-      <Stack key={`${scoreType}-calcutta-table`} p="lg" bg="dark.8">
-        <Title tt="capitalize">{title}</Title>
-        <DataTable
-          ta="left"
-          fz="lg"
-          minHeight={150}
-          noRecordsText="No results yet"
-          noRecordsIcon={
-            <Box className="noRecordsBox">
-              <IconGolfOff size={24} />
-            </Box>
-          }
-          styles={{
-            header: (theme) => ({
-              backgroundColor: theme.colors.dark[8],
-            }),
-          }}
-          columns={[
-            {
-              accessor: 'aPlayer',
-            },
-            {
-              accessor: 'bPlayer',
-            },
-            {
-              accessor: 'score',
-            },
-          ]}
-          records={calcuttaTableData[scoreType]}
-          rowExpansion={{
-            collapseProps: {
-              transitionDuration: 400,
-              animateOpacity: false,
-              transitionTimingFunction: 'ease-out',
-            },
-            expanded: {
-              recordIds: tableStates[scoreType].recordIds,
-              onRecordIdsChange: tableStates[scoreType].setExpandedRecordIds,
-            },
-            content: ({ record }) => <Scorecard data={record.scorecardData} />,
-          }}
-        />
+      <Group align="flex-start" {...otherProps}>
+        <Trophy place={number} />
+        <Stack ta="left" gap={0}>
+          <Text fw="bold" fz="lg">
+            {score}{' '}
+            <Text span inherit c="indigo">
+              (${winnings})
+            </Text>
+          </Text>
+
+          {winners.map((winner) => (
+            <Text fz="lg" key={`winner-${winner}`}>
+              {winner}
+            </Text>
+          ))}
+        </Stack>
+      </Group>
+    );
+  };
+
+  const Podium = (props: PodiumProps) => {
+    const { title, places, ...otherProps } = props;
+
+    return (
+      <Stack {...otherProps}>
+        <Title order={3}>{title}</Title>
+        <Paper withBorder shadow="lg" p="xl" gap="lg" component={Stack}>
+          {places.map((place) => (
+            <Place
+              number={place.number}
+              score={place.score}
+              winnings={place.winnings}
+              winners={place.winners}
+              key={`place-${place.number}`}
+            />
+          ))}
+        </Paper>
       </Stack>
     );
-  });
+  };
+
+  const CalcuttaTable = (props: CalcuttaTableProps) => {
+    const { scoreType, records, ...otherProps } = props;
+    const title = `${scoreType}${isSample ? ' Sample' : ''}`;
+
+    return (
+      <Stack {...otherProps}>
+        <SectionTitle order={2}>{title}</SectionTitle>
+        <Paper withBorder shadow="lg">
+          <DataTable
+            ta="left"
+            fz="lg"
+            withTableBorder={false}
+            borderRadius="4px"
+            minHeight={150}
+            noRecordsText="No results yet"
+            noRecordsIcon={
+              <Box className="noRecordsBox">
+                <IconGolfOff size={24} />
+              </Box>
+            }
+            styles={{
+              header: (theme) => ({
+                backgroundColor: theme.colors.dark[8],
+              }),
+            }}
+            columns={[
+              {
+                accessor: 'aPlayer',
+              },
+              {
+                accessor: 'bPlayer',
+              },
+              {
+                accessor: 'score',
+              },
+            ]}
+            records={records}
+            rowExpansion={{
+              collapseProps: {
+                transitionDuration: 400,
+                animateOpacity: false,
+                transitionTimingFunction: 'ease-out',
+              },
+              content: ({ record }) => <Scorecard data={record.scorecardData} />,
+            }}
+          />
+        </Paper>
+      </Stack>
+    );
+  };
+
+  const winners = getWinners();
 
   return (
     <Stack>
       <Group justify="space-between">
         <DaySelector
           value={tournamentDay}
-          onChange={(day) => {
-            collapseExpandedRows();
-            setTournamentDay(day as TournamentDay);
-          }}
+          onChange={(day) => setTournamentDay(day as TournamentDay)}
         />
-        <ActionIcon
-          variant="gradient"
-          aria-label="Download calcutta"
-          gradient={DEFAULT_GRADIENT}
-          onClick={downloadCalcutta}
-        >
-          <IconDownload />
-        </ActionIcon>
+        <Group>
+          <PrizePoolInput labelId="calcuttaPrizePool" value={prizePool} onChange={setPrizePool} />
+          <ActionIcon
+            variant="gradient"
+            aria-label="Download calcutta"
+            gradient={DEFAULT_GRADIENT}
+            onClick={downloadCalcutta}
+          >
+            <IconDownload />
+          </ActionIcon>
+        </Group>
       </Group>
-      {calcuttaTables}
+      <Stack gap="xl">
+        {!isSample && (
+          <Stack>
+            <SectionTitle>Results</SectionTitle>
+            <Group justify="space-around" align="flex-start">
+              <Podium title="Net" places={getPlaces(ScoreType.NET, winners)} />
+              <Podium title="Gross" places={getPlaces(ScoreType.GROSS, winners)} />
+            </Group>
+          </Stack>
+        )}
+        <SectionTitle>Scores</SectionTitle>
+        <CalcuttaTable scoreType={ScoreType.NET} records={calcuttaTableData.net} />
+        <CalcuttaTable scoreType={ScoreType.GROSS} records={calcuttaTableData.gross} />
+      </Stack>
     </Stack>
   );
 }
 
 const getCalcuttaTableData = (calcutta: CalcuttaTeam[]) => {
   const tableData: CalcuttaTableData = { gross: [], net: [] };
-  calcutta.map((calcuttaTeam) => {
+  calcutta.map((calcuttaTeam, index) => {
     const aPlayerName = players.getPlayerName(calcuttaTeam.a.id);
     const bPlayerName = players.getPlayerName(calcuttaTeam.b.id);
     Object.values(ScoreType).map((scoreType) => {
       tableData[scoreType].push({
+        id: index,
         aPlayer: aPlayerName,
         bPlayer: bPlayerName,
-        score: getScore(calcuttaTeam[scoreType]),
+        score: sum(calcuttaTeam[scoreType]),
         scorecardData: {
           a: {
             name: aPlayerName,
@@ -263,20 +507,5 @@ const getCalcuttaTableData = (calcutta: CalcuttaTeam[]) => {
 const sortCalcuttaTableData = (tableData: CalcuttaTableData) => {
   tableData.gross = tableData.gross.sort((a, b) => a.score - b.score);
   tableData.net = tableData.net.sort((a, b) => a.score - b.score);
-
-  // Find a way to skip expanded row close animation
-  // when switching to different day to avoid needing
-  // to set index after sort. Otherwise, a different
-  // row in the selected day may play the close animation
-  // and it looks odd. e.g. Friday -> expand row 1 ->
-  // Switch to Saturday -> row 2 plays close animation
-  tableData.gross = tableData.gross.map((calcuttaTeam, index) => {
-    calcuttaTeam.id = index;
-    return calcuttaTeam;
-  });
-  tableData.net = tableData.net.map((calcuttaTeam, index) => {
-    calcuttaTeam.id = index;
-    return calcuttaTeam;
-  });
   return tableData;
 };

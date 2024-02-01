@@ -4,9 +4,11 @@ import { IconPlus } from '@tabler/icons-react';
 
 import { DEFAULT_GRADIENT } from 'components/constants';
 import { NewRound, NewRoundTitle } from 'components/round/NewRound';
+import { useDevice } from 'components/util';
 
 export function Dashboard() {
   const [opened, { open, close }] = useDisclosure(false);
+  const { isMobile } = useDevice();
 
   return (
     <>
@@ -15,6 +17,7 @@ export function Dashboard() {
         onClose={close}
         title={<NewRoundTitle />}
         size="xl"
+        fullScreen={isMobile}
         overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
       >
         <NewRound closeModal={close} />

@@ -2,13 +2,17 @@ import { Link } from 'react-router-dom';
 import { NavLink } from '@mantine/core';
 import { IconCurrencyDollar, IconHome, IconPlayCard, IconTrophy } from '@tabler/icons-react';
 
+import { useDevice } from 'components/util';
+
 interface NavbarProps {
   activeRoute: number;
   setActiveRoute: (routeIndex: number) => void;
+  toggle: () => void;
 }
 
 export function Navbar(props: NavbarProps) {
-  const { activeRoute, setActiveRoute } = props;
+  const { activeRoute, setActiveRoute, toggle } = props;
+  const { isMobile } = useDevice();
 
   const navLinks = [
     { icon: IconHome, href: '/', label: 'Dashboard' },
@@ -24,8 +28,11 @@ export function Navbar(props: NavbarProps) {
       label={link.label}
       active={index === activeRoute}
       leftSection={<link.icon />}
-      onClick={() => setActiveRoute(index)}
-      variant="subtle"
+      onClick={() => {
+        if (isMobile) toggle();
+        setActiveRoute(index);
+      }}
+      variant="light"
       component={Link}
     />
   ));

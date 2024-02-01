@@ -1,3 +1,5 @@
+import { useMediaQuery } from '@mantine/hooks';
+
 import { TournamentDay } from './constants';
 
 export function getTournamentDay() {
@@ -22,21 +24,27 @@ export const getFullName = (firstName: string, lastName: string) => {
 };
 
 export const getOut = (holes: Array<number>) => {
-  return getScore(holes, 0, 9);
+  return sum(holes, 0, 9);
 };
 
 export const getIn = (holes: Array<number>) => {
-  return getScore(holes, -9);
+  return sum(holes, -9);
 };
 
 export const getGross = (holes: Array<number>) => {
-  return getScore(holes);
+  return sum(holes);
 };
 
 export const getNet = (holes: Array<number>, handicap: number) => {
   return getGross(holes) - handicap;
 };
 
-export const getScore = (holes: number[], start?: number, end?: number) => {
-  return holes.slice(start, end).reduce((sum, current) => sum + current, 0);
+export const sum = (arrToSum: number[], start?: number, end?: number) => {
+  return arrToSum.slice(start, end).reduce((sum, current) => sum + current, 0);
+};
+
+export const useDevice = () => {
+  const isMobile = useMediaQuery('(max-width: 48em)');
+
+  return { isMobile };
 };

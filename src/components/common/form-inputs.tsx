@@ -64,7 +64,6 @@ export const PrizePoolInput = (props: PrizePoolInputProps) => {
         allowNegative={false}
         thousandSeparator=","
         onFocus={(e) => e.target.select()}
-        classNames={{ input: 'prizePoolInput' }}
       />
     </>
   );
@@ -126,6 +125,7 @@ export const PlayerInput = (props: SelectProps) => {
       }}
       searchable
       clearable
+      selectFirstOptionOnChange
       {...props}
     />
   );

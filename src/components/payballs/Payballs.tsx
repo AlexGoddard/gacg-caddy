@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
 import { useState } from 'react';
-import { ActionIcon, Box, Group, Stack, Title } from '@mantine/core';
+import { ActionIcon, Group, Stack, Title } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
 
 import { TitledTable } from 'components/common/data-display';
@@ -10,6 +10,8 @@ import { getTournamentDay, getTournamentYear } from 'components/util';
 import { rounds } from 'data/rounds';
 
 import './style.less';
+
+const HEADERS = ['Player', 'Hole', 'Score'];
 
 export function Payballs() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
@@ -22,8 +24,12 @@ export function Payballs() {
       scoreType: payballData.scoreType,
       division: payballData.division,
       elementData: {
-        head: ['Player', 'Hole', 'Score'],
-        body: payballData.payballs.map((payball) => [payball.player, payball.hole, payball.score]),
+        head: HEADERS,
+        body: payballData.payballs.map((payball) => [
+          payball.player,
+          payball.hole.toString(),
+          payball.score.toString(),
+        ]),
       },
     };
   });
@@ -45,9 +51,11 @@ export function Payballs() {
   const downloadPayballs = () => {
     const zip = new JSZip();
     payballTableData.map((payballData) => {
+      const payballsFileData = [HEADERS];
+      payballData.elementData.body.map((payball) => payballsFileData.push(payball));
       zip.file(
         `payballs-${payballData.scoreType}-${payballData.division}.csv`,
-        new Blob([payballData.elementData.body.map((row) => row.join(',')).join('\n')], {
+        new Blob([payballsFileData.map((row) => row.join(',')).join('\n')], {
           type: 'text/csv',
         }),
       );
@@ -91,34 +99,30 @@ export function Payballs() {
           </ActionIcon>
         </Group>
       </Group>
-      <Box p="lg" bg="dark.8">
-        <Stack gap={0}>
-          <Title>Gross Payballs</Title>
-          <Title c="indigo" order={3}>
-            ($
-            {grossPayballValue})
-          </Title>
-        </Stack>
-        <Group align="flex-start" justify="space-around">
-          {payballTables
-            .filter((table) => table.scoreType === ScoreType.GROSS)
-            .map((table) => table.element)}
-        </Group>
-      </Box>
-      <Box p="lg" bg="dark.8">
-        <Stack gap={0}>
-          <Title>Net Payballs</Title>
-          <Title c="indigo" order={3}>
-            ($
-            {netPayballValue})
-          </Title>
-        </Stack>
-        <Group align="flex-start" justify="space-around">
-          {payballTables
-            .filter((table) => table.scoreType === ScoreType.NET)
-            .map((table) => table.element)}
-        </Group>
-      </Box>
+      <Stack gap={0}>
+        <Title>Gross Payballs</Title>
+        <Title c="indigo" order={3}>
+          ($
+          {grossPayballValue})
+        </Title>
+      </Stack>
+      <Group align="flex-start" justify="space-around">
+        {payballTables
+          .filter((table) => table.scoreType === ScoreType.GROSS)
+          .map((table) => table.element)}
+      </Group>
+      <Stack gap={0}>
+        <Title>Net Payballs</Title>
+        <Title c="indigo" order={3}>
+          ($
+          {netPayballValue})
+        </Title>
+      </Stack>
+      <Group align="flex-start" justify="space-around">
+        {payballTables
+          .filter((table) => table.scoreType === ScoreType.NET)
+          .map((table) => table.element)}
+      </Group>
     </Stack>
   );
 }

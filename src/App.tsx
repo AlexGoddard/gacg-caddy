@@ -25,14 +25,14 @@ function App() {
           breakpoint: 'sm',
           collapsed: { desktop: !navOpened, mobile: !navOpened },
         }}
-        padding="xl"
+        p="xl"
         withBorder={false}
       >
         <AppShell.Header>
           <Header toggle={toggle} setActiveRoute={setActiveRoute} />
         </AppShell.Header>
         <AppShell.Navbar>
-          <Navbar activeRoute={activeRoute} setActiveRoute={setActiveRoute} />
+          <Navbar activeRoute={activeRoute} setActiveRoute={setActiveRoute} toggle={toggle} />
         </AppShell.Navbar>
         <AppShell.Main>
           <Routes>
