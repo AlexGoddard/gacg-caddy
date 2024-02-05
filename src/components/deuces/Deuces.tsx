@@ -5,21 +5,25 @@ import { IconDownload } from '@tabler/icons-react';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { DEFAULT_GRADIENT, TournamentDay } from 'components/constants';
 import { getTournamentDay, getTournamentYear } from 'components/util';
-import { rounds } from 'data/rounds';
+import { useDeuces } from 'hooks/rounds';
 
 import './style.less';
 
 const HEADERS = ['Player', 'Hole'];
+const ELIGIBLE_DAYS = [TournamentDay.FRIDAY, TournamentDay.SATURDAY];
 
 export function Deuces() {
-  const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
-  const [prizePool, setPrizePool] = useState<string | number>(100);
-
-  const deuces = rounds.getAllDeuces(tournamentDay);
-  const deuceTableData = deuces.map((deuce) => [deuce.player, deuce.hole.toString()]);
-  // Prizes are given in $5 increments
-  const deuceValue =
-    Math.floor(Number(prizePool) / (deuceTableData.length > 0 ? deuceTableData.length : 1) / 5) * 5;
+  const currentTournamentDay = getTournamentDay();
+  const [tournamentDay, setTournamentDay] = useState(
+    ELIGIBLE_DAYS.includes(currentTournamentDay) ? currentTournamentDay : TournamentDay.FRIDAY,
+  );
+  const [prizePool, setPrizePool] = useState<string | number>(140);
+  const { isSuccess, data } = useDeuces(tournamentDay);
+  const deuces = isSuccess ? data : [];
+  const deuceTableData = deuces.map((deuce) => [deuce.player, deuce.holeNumber.toString()]);
+  const deuceValue = Math.floor(
+    Number(prizePool) / (deuceTableData.length > 0 ? deuceTableData.length : 1),
+  );
 
   const downloadDeuces = () => {
     const deucesFileData = [HEADERS];
@@ -37,6 +41,7 @@ export function Deuces() {
     <Stack>
       <Group justify="space-between">
         <DaySelector
+          days={ELIGIBLE_DAYS}
           value={tournamentDay}
           onChange={(day) => setTournamentDay(day as TournamentDay)}
         />

@@ -19,10 +19,6 @@ export const getTournamentYear = () => {
   return currentDate.getFullYear();
 };
 
-export const getFullName = (firstName: string, lastName: string) => {
-  return `${firstName} ${lastName}`;
-};
-
 export const getOut = (holes: Array<number>) => {
   return sum(holes, 0, 9);
 };

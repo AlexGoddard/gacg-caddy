@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
-import fs from 'fs';
 import path from 'node:path';
+
+import * as dbm from './data/database-manager';
 
 // The built directory structure
 //
@@ -61,11 +62,34 @@ app.on('activate', () => {
 
 app.whenReady().then(createWindow);
 
-ipcMain.handle('post/round', (event, args) => {
-  try {
-    fs.writeFileSync('./src/data/rounds.json', JSON.stringify(args));
-    return true;
-  } catch (err) {
-    return false;
-  }
+ipcMain.handle('/calcutta/get', (_, args) => {
+  return dbm.getCalcutta(args.day);
+});
+
+ipcMain.handle('/calcutta-teams/get', () => {
+  return dbm.getCalcuttaTeams();
+});
+
+ipcMain.handle('/deuces/get', (_, args) => {
+  return dbm.getDeuces(args.day);
+});
+
+ipcMain.handle('/holes/get', () => {
+  return dbm.getHoles();
+});
+
+ipcMain.handle('/payballs/get', (_, args) => {
+  return dbm.getPayballs(args.day);
+});
+
+ipcMain.handle('/players/get', () => {
+  return dbm.getPlayers();
+});
+
+ipcMain.handle('/rounds/get', () => {
+  return dbm.getRounds();
+});
+
+ipcMain.handle('/rounds/post', (_, args) => {
+  return dbm.saveRound(args.round);
 });

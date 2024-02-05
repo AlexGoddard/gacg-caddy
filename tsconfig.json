@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "components/*": ["./src/components/*"],
-      "data/*": ["./src/data/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "util/*": ["./src/util/*"],
     },
     "target": "ES2020",
     "useDefineForClassFields": true,

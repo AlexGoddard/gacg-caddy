@@ -2,6 +2,7 @@ import {
   Chip,
   ChipGroupProps,
   Group,
+  Loader,
   NumberInput,
   NumberInputProps,
   Paper,
@@ -13,10 +14,14 @@ import {
 } from '@mantine/core';
 import { IconCurrencyDollar } from '@tabler/icons-react';
 
+import { ErrorFeedback } from 'components/common/feedback';
 import { Division, TournamentDay } from 'components/constants';
-import { getFullName } from 'components/util';
-import { Hole } from 'data/holes';
-import { players } from 'data/players';
+import { Hole } from 'hooks/holes';
+import { usePlayers } from 'hooks/players';
+
+interface DaySelectorProps extends ChipGroupProps {
+  days?: TournamentDay[];
+}
 
 interface PrizePoolInputProps extends NumberInputProps {
   labelId: string;
@@ -26,19 +31,17 @@ interface HoleInputProps extends NumberInputProps {
   hole: Hole;
 }
 
-export const DaySelector = (props: ChipGroupProps) => {
+export const DaySelector = (props: DaySelectorProps) => {
+  const { days, ...otherProps } = props;
+  const availableDays = days ? days : Object.values(TournamentDay);
   return (
-    <Chip.Group {...props}>
+    <Chip.Group {...otherProps}>
       <Group justify="left">
-        <Chip variant="light" value={TournamentDay.FRIDAY}>
-          Friday
-        </Chip>
-        <Chip variant="light" value={TournamentDay.SATURDAY}>
-          Saturday
-        </Chip>
-        <Chip variant="light" value={TournamentDay.SUNDAY}>
-          Sunday
-        </Chip>
+        {availableDays.map((day) => (
+          <Chip variant="light" value={day} tt="capitalize" key={`${day}-selector`}>
+            {day}
+          </Chip>
+        ))}
       </Group>
     </Chip.Group>
   );
@@ -91,42 +94,41 @@ export const HoleInput = (props: HoleInputProps) => {
 };
 
 export const PlayerInput = (props: SelectProps) => {
-  const playerList = players.getPlayers();
+  const { isPending, isSuccess, isError, error, data } = usePlayers();
+  const players = isSuccess ? data : [];
+
+  const getPlayerItemsByDivision = (division: Division) =>
+    players
+      .filter((player) => player.division === division)
+      .map((player) => {
+        return {
+          value: player.id.toString(),
+          label: player.fullName,
+        };
+      });
+
   return (
-    <Select
-      aria-label="Player select"
-      placeholder="Search players.."
-      data={[
-        {
-          group: 'A Division',
-          items: playerList
-            .filter((player) => player.division === Division.A)
-            .map((player) => {
-              return {
-                value: player.id.toString(),
-                label: getFullName(player.firstName, player.lastName),
-              };
-            }),
-        },
-        {
-          group: 'B Division',
-          items: playerList
-            .filter((player) => player.division === Division.B)
-            .map((player) => {
-              return {
-                value: player.id.toString(),
-                label: getFullName(player.firstName, player.lastName),
-              };
-            }),
-        },
-      ]}
-      comboboxProps={{
-        transitionProps: { transition: 'pop', duration: 300 },
-      }}
-      searchable
-      clearable
-      selectFirstOptionOnChange
-      {...props}
-    />
+    <Group gap="xs">
+      <Select
+        aria-label="Player select"
+        placeholder={isPending ? 'Loading players..' : 'Search players..'}
+        disabled={!isSuccess}
+        data={Object.values(Division).map((division) => {
+          return {
+            group: `${division.toUpperCase()} Division`,
+            items: getPlayerItemsByDivision(division),
+          };
+        })}
+        comboboxProps={{
+          transitionProps: { transition: 'pop', duration: 300 },
+        }}
+        searchable
+        clearable
+        selectFirstOptionOnChange
+        {...props}
+      />
+      {isPending && <Loader size="xs" />}
+      {isError && <ErrorFeedback label={error.message} />}
+    </Group>
   );
 };

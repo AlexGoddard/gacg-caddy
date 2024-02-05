@@ -18,9 +18,8 @@ import { Scorecard } from './Scorecard';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
-import { sum, getTournamentDay, getTournamentYear } from 'components/util';
-import { players } from 'data/players';
-import { CalcuttaTeam, rounds } from 'data/rounds';
+import { sum, getTournamentDay } from 'components/util';
+import { CalcuttaTeam, useCalcutta, useDownloadCalcutta } from 'hooks/rounds';
 
 import './style.less';
 
@@ -79,115 +78,19 @@ interface CalcuttaTableProps extends StackProps {
   records: CalcuttaTeamData[];
 }
 
-const SAMPLE_HEADERS = [
-  'A Player',
-  'Handicap',
-  'Friday Gross',
-  'Friday Net',
-  'Saturday Gross',
-  'Saturday Net',
-  'B Player',
-  'Handicap',
-  'Friday Gross',
-  'Friday Net',
-  'Saturday Gross',
-  'Saturday Net',
-  'Team Friday Gross',
-  'Team Friday Net',
-  'Team Saturday Gross',
-  'Team Saturday Net',
-];
-
-const HEADERS = [
-  'A Player',
-  'Handicap',
-  'Gross',
-  'Net',
-  'B Player',
-  'Handicap',
-  'Gross',
-  'Net',
-  'Team Gross',
-  'Team Net',
-];
-
 export function Calcutta() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
   const [prizePool, setPrizePool] = useState<string | number>(5000);
 
   const isSample = tournamentDay !== TournamentDay.SUNDAY;
-  const calcutta = rounds.getCalcutta(tournamentDay);
+  const { isSuccess, data } = useCalcutta(tournamentDay);
+  const calcuttaFiles = useDownloadCalcutta(isSample);
+  const calcutta = isSuccess ? data : [];
+
   const calcuttaTableData = getCalcuttaTableData(calcutta);
 
   const downloadCalcutta = () => {
-    const calcuttaFileData = [];
-    if (isSample) {
-      const fridayCalcutta =
-        tournamentDay === TournamentDay.FRIDAY
-          ? calcutta
-          : rounds.getCalcutta(TournamentDay.FRIDAY);
-      const saturdayCalcutta =
-        tournamentDay === TournamentDay.SATURDAY
-          ? calcutta
-          : rounds.getCalcutta(TournamentDay.SATURDAY);
-
-      calcuttaFileData.push(SAMPLE_HEADERS);
-      fridayCalcutta.map((fridayCalcuttaTeam) => {
-        const matchingSaturdayTeam = saturdayCalcutta.find(
-          (saturdayCalcuttaTeam) => fridayCalcuttaTeam.a.id === saturdayCalcuttaTeam.a.id,
-        );
-        // Don't include teams without scores on Friday and Saturday
-        if (!matchingSaturdayTeam) return;
-
-        calcuttaFileData.push([
-          // A Player
-          players.getPlayerName(fridayCalcuttaTeam.a.id),
-          players.getHandicap(fridayCalcuttaTeam.a.id),
-          sum(fridayCalcuttaTeam.a.gross),
-          sum(fridayCalcuttaTeam.a.net),
-          sum(matchingSaturdayTeam.a.gross),
-          sum(matchingSaturdayTeam.a.net),
-          // B Player
-          players.getPlayerName(fridayCalcuttaTeam.b.id),
-          players.getHandicap(fridayCalcuttaTeam.b.id),
-          sum(fridayCalcuttaTeam.b.gross),
-          sum(fridayCalcuttaTeam.b.net),
-          sum(matchingSaturdayTeam.b.gross),
-          sum(matchingSaturdayTeam.b.net),
-          // Team
-          sum(fridayCalcuttaTeam.gross),
-          sum(fridayCalcuttaTeam.net),
-          sum(matchingSaturdayTeam.gross),
-          sum(matchingSaturdayTeam.net),
-        ]);
-      });
-    } else {
-      calcuttaFileData.push(HEADERS);
-      calcutta.map((calcuttaTeam) =>
-        calcuttaFileData.push([
-          // A Player
-          players.getPlayerName(calcuttaTeam.a.id),
-          players.getHandicap(calcuttaTeam.a.id),
-          sum(calcuttaTeam.a.gross),
-          sum(calcuttaTeam.a.net),
-          // B Player
-          players.getPlayerName(calcuttaTeam.b.id),
-          players.getHandicap(calcuttaTeam.b.id),
-          sum(calcuttaTeam.b.gross),
-          sum(calcuttaTeam.b.net),
-          // Team
-          sum(calcuttaTeam.gross),
-          sum(calcuttaTeam.net),
-        ]),
-      );
-    }
-    const calcuttaFile = new Blob([calcuttaFileData.map((row) => row.join(',')).join('\n')], {
-      type: 'text/csv',
-    });
-    const element = document.createElement('a');
-    element.href = URL.createObjectURL(calcuttaFile);
-    element.download = `calcutta-${isSample ? 'sample-' : ''}${getTournamentYear()}.csv`;
-    element.click();
+    calcuttaFiles.download();
   };
 
   const getWinnings = (payouts: number[], teamsAlreadyPlaced: number, numTeams: number) => {
@@ -196,8 +99,8 @@ export function Calcutta() {
 
   const getWinners = () => {
     const winners: CalcuttaWinner[] = [];
-    const netPayouts = [0.2, 0.18, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
-    const grossPayouts = [0.12, 0.1, 0.05].map((percent) => percent * Number(prizePool));
+    const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
+    const grossPayouts = [0.1, 0.05].map((percent) => percent * Number(prizePool));
 
     // The number of teams who have already placed
     let netPlaced = 0;
@@ -302,6 +205,38 @@ export function Calcutta() {
     }
     return winners;
   };
+
+  function getCalcuttaTableData(calcutta: CalcuttaTeam[]) {
+    const tableData: CalcuttaTableData = { gross: [], net: [] };
+    calcutta.map((calcuttaTeam, index) => {
+      Object.values(ScoreType).map((scoreType) => {
+        tableData[scoreType].push({
+          id: index,
+          aPlayer: calcuttaTeam.a.name,
+          bPlayer: calcuttaTeam.b.name,
+          score: sum(calcuttaTeam[scoreType]),
+          scorecardData: {
+            a: {
+              name: calcuttaTeam.a.name,
+              scores: calcuttaTeam.a[scoreType] ? calcuttaTeam.a[scoreType]! : [],
+            },
+            b: {
+              name: calcuttaTeam.b.name,
+              scores: calcuttaTeam.b[scoreType] ? calcuttaTeam.b[scoreType]! : [],
+            },
+            teamScores: calcuttaTeam[scoreType],
+          },
+        });
+      });
+    });
+    return sortCalcuttaTableData(tableData);
+  }
+
+  function sortCalcuttaTableData(tableData: CalcuttaTableData) {
+    tableData.gross = tableData.gross.sort((a, b) => a.score - b.score);
+    tableData.net = tableData.net.sort((a, b) => a.score - b.score);
+    return tableData;
+  }
 
   const getPlaces = (scoreType: ScoreType, winners: CalcuttaWinner[]) => {
     const availablePlaces = scoreType === ScoreType.NET ? [1, 2, 3, 4, 5] : [1, 2, 3];
@@ -475,37 +410,3 @@ export function Calcutta() {
     </Stack>
   );
 }
-
-const getCalcuttaTableData = (calcutta: CalcuttaTeam[]) => {
-  const tableData: CalcuttaTableData = { gross: [], net: [] };
-  calcutta.map((calcuttaTeam, index) => {
-    const aPlayerName = players.getPlayerName(calcuttaTeam.a.id);
-    const bPlayerName = players.getPlayerName(calcuttaTeam.b.id);
-    Object.values(ScoreType).map((scoreType) => {
-      tableData[scoreType].push({
-        id: index,
-        aPlayer: aPlayerName,
-        bPlayer: bPlayerName,
-        score: sum(calcuttaTeam[scoreType]),
-        scorecardData: {
-          a: {
-            name: aPlayerName,
-            scores: calcuttaTeam.a[scoreType] ? calcuttaTeam.a[scoreType]! : [],
-          },
-          b: {
-            name: bPlayerName,
-            scores: calcuttaTeam.b[scoreType] ? calcuttaTeam.b[scoreType]! : [],
-          },
-          teamScores: calcuttaTeam[scoreType],
-        },
-      });
-    });
-  });
-  return sortCalcuttaTableData(tableData);
-};
-
-const sortCalcuttaTableData = (tableData: CalcuttaTableData) => {
-  tableData.gross = tableData.gross.sort((a, b) => a.score - b.score);
-  tableData.net = tableData.net.sort((a, b) => a.score - b.score);
-  return tableData;
-};
