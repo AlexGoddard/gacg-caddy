@@ -1,6 +1,12 @@
 import { Link } from 'react-router-dom';
 import { NavLink } from '@mantine/core';
-import { IconCurrencyDollar, IconHome, IconPlayCard, IconTrophy } from '@tabler/icons-react';
+import {
+  IconCurrencyDollar,
+  IconGolf,
+  IconHome,
+  IconPlayCard,
+  IconTrophy,
+} from '@tabler/icons-react';
 
 import { useDevice } from 'components/util';
 
@@ -16,6 +22,7 @@ export function Navbar(props: NavbarProps) {
 
   const navLinks = [
     { icon: IconHome, href: '/', label: 'Dashboard' },
+    { icon: IconGolf, href: '/rounds', label: 'Rounds' },
     { icon: IconCurrencyDollar, href: '/payballs', label: 'Payballs' },
     { icon: IconPlayCard, href: '/deuces', label: 'Deuces' },
     { icon: IconTrophy, href: '/calcutta', label: 'Calcutta' },

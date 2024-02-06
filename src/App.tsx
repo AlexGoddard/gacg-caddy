@@ -11,6 +11,7 @@ import { Deuces } from 'components/deuces/Deuces';
 import { Header } from 'components/header/Header';
 import { Navbar } from 'components/navbar/Navbar';
 import { Payballs } from 'components/payballs/Payballs';
+import { Rounds } from 'components/round/Rounds';
 
 import './App.css';
 
@@ -41,6 +42,7 @@ function App() {
           <AppShell.Main>
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/rounds" element={<Rounds />} />
               <Route path="/payballs" element={<Payballs />} />
               <Route path="/deuces" element={<Deuces />} />
               <Route path="/calcutta" element={<Calcutta />} />

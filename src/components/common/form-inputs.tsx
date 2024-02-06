@@ -33,7 +33,9 @@ interface HoleInputProps extends NumberInputProps {
 
 export const DaySelector = (props: DaySelectorProps) => {
   const { days, ...otherProps } = props;
-  const availableDays = days ? days : Object.values(TournamentDay);
+  const availableDays = days
+    ? days
+    : [TournamentDay.FRIDAY, TournamentDay.SATURDAY, TournamentDay.SUNDAY];
   return (
     <Chip.Group {...otherProps}>
       <Group justify="left">

@@ -1,11 +1,22 @@
 import { ReactNode } from 'react';
-import { Box, Flex, Indicator, LoadingOverlay, Overlay, Table, Title } from '@mantine/core';
-import { useQueries } from '@tanstack/react-query';
+import {
+  Box,
+  Flex,
+  Indicator,
+  LoadingOverlay,
+  Overlay,
+  Table,
+  TableProps,
+  Title,
+} from '@mantine/core';
 
-import { ScorecardProps } from 'components/calcutta/Calcutta';
-import { useHolesQuery } from 'hooks/holes';
-import { useCalcuttaTeamHolesQuery } from 'hooks/rounds';
+import { ScoreType } from 'components/constants';
 import { sum } from 'components/util';
+import { useHoles } from 'hooks/holes';
+
+const PLACEHOLDER_HOLES = new Array(18).fill(4).map((hole, index) => {
+  return { holeNumber: index, par: hole, handicap: hole };
+});
 
 interface HoleHeaders {
   numbers: ReactNode[];
@@ -13,47 +24,55 @@ interface HoleHeaders {
   handicaps: ReactNode[];
 }
 
-export const Scorecard = (props: ScorecardProps) => {
-  const { data, ...otherProps } = props;
-  const [calcuttaTeamHolesQuery, holesQuery] = useQueries({
-    queries: [
-      useCalcuttaTeamHolesQuery(data.day, data.scoreType, data.a.id, data.b.id),
-      useHolesQuery,
-    ],
-  });
-  const calcuttaTeamHoles = calcuttaTeamHolesQuery.isSuccess
-    ? calcuttaTeamHolesQuery.data
-    : { a: [], b: [], team: [] };
-  const holes = holesQuery.isSuccess ? holesQuery.data : [];
+interface ScorecardProps extends TableProps {
+  rows: ScoreRow[];
+  rowsQueryStatus: 'error' | 'success' | 'pending';
+  scoreType: ScoreType;
+}
 
-  const isPending = calcuttaTeamHolesQuery.isPending || holesQuery.isPending;
-  const isError = calcuttaTeamHolesQuery.isError || holesQuery.isError;
+interface ScoreRow {
+  name: string;
+  scores: number[];
+  isTeamScore?: boolean;
+}
+
+export const Scorecard = (props: ScorecardProps) => {
+  const { rows, rowsQueryStatus, scoreType, ...otherProps } = props;
+  const teamScores = rows.find((row) => row.isTeamScore);
+  const holesQuery = useHoles();
+  const holes = holesQuery.isSuccess ? holesQuery.data : PLACEHOLDER_HOLES;
+
+  const isPending = rowsQueryStatus === 'pending' || holesQuery.isPending;
+  const isError = rowsQueryStatus === 'error' || holesQuery.isError;
 
   const holeHeaders: HoleHeaders = {
     numbers: [],
     pars: [],
     handicaps: [],
   };
-  holes.map((hole) => {
-    holeHeaders.numbers.push(
-      <Table.Td key={`hole-${hole.holeNumber}-number`}>{hole.holeNumber}</Table.Td>,
+  holes.map((hole, index) => {
+    holeHeaders.numbers[index] = (
+      <Table.Td key={`hole-${hole.holeNumber}-number`}>{hole.holeNumber}</Table.Td>
     );
-    holeHeaders.pars.push(
+    holeHeaders.pars[index] = (
       <Table.Td key={`hole-${hole.holeNumber}-par`} c="green">
         {hole.par}
-      </Table.Td>,
+      </Table.Td>
     );
-    holeHeaders.handicaps.push(
+    holeHeaders.handicaps[index] = (
       <Table.Td key={`hole-${hole.holeNumber}-handicap`} c="red">
         {hole.handicap}
-      </Table.Td>,
+      </Table.Td>
     );
   });
 
-  const scoreRows = (name: string, scores: number[], isPlayerScore = true) => {
-    const scoreElements = scores.map((holeScore, holeIndex) => (
-      <Table.Td key={`${name}-hole-${holeIndex + 1}-score`}>
-        {isPlayerScore && calcuttaTeamHoles.team[holeIndex] === holeScore ? (
+  const scoreRow = (row: ScoreRow) => {
+    const outScore = sum(row.scores.slice(0, 9));
+    const inScore = sum(row.scores.slice(-9));
+    const totalScore = sum(row.scores);
+    const scoreElements = row.scores.map((holeScore, holeIndex) => (
+      <Table.Td key={`${row.name}-hole-${holeIndex + 1}-score`}>
+        {!row.isTeamScore && teamScores && teamScores.scores[holeIndex] === holeScore ? (
           <Indicator size={4} color="green.7" zIndex={1}>
             {holeScore}
           </Indicator>
@@ -62,12 +81,10 @@ export const Scorecard = (props: ScorecardProps) => {
         )}
       </Table.Td>
     ));
-    const outScore = sum(scores.slice(0, 9));
-    const inScore = sum(scores.slice(-9));
-    const totalScore = sum(scores);
+
     return (
-      <Table.Tr key={`${name}-table-row`}>
-        <Table.Td className="leftLabel">{name}</Table.Td>
+      <Table.Tr tt="capitalize" key={`${row.name}-table-row`}>
+        <Table.Td className="leftLabel">{row.name}</Table.Td>
         {scoreElements.slice(0, 9)}
         <Table.Td>{outScore !== 0 && outScore}</Table.Td>
         {scoreElements.slice(-9)}
@@ -91,17 +108,14 @@ export const Scorecard = (props: ScorecardProps) => {
           <Table.Tr className="scorecardInfo">
             <Table.Td className="leftLabel">HOLE</Table.Td>
             {holeHeaders.numbers.slice(0, 9)}
-            <Table.Td>Out</Table.Td>
+            <Table.Td>OUT</Table.Td>
             {holeHeaders.numbers.slice(-9)}
             <Table.Td>IN</Table.Td>
-            <Table.Td tt="uppercase">{data.scoreType}</Table.Td>
+            <Table.Td tt="uppercase">{scoreType}</Table.Td>
           </Table.Tr>
 
-          {/* A Player Scores */}
-          {scoreRows(data.a.name, calcuttaTeamHoles.a)}
-
-          {/* B Player Scores */}
-          {scoreRows(data.b.name, calcuttaTeamHoles.b)}
+          {/* First Two Score Rows */}
+          {rows.slice(0, 2).map((row) => scoreRow(row))}
 
           {/* Pars */}
           <Table.Tr className="scorecardInfo">
@@ -115,8 +129,8 @@ export const Scorecard = (props: ScorecardProps) => {
             <Table.Td c="green">72</Table.Td>
           </Table.Tr>
 
-          {/* Team Scores */}
-          {scoreRows('Team', calcuttaTeamHoles.team, false)}
+          {/* Last Two Score Rows */}
+          {rows.slice(2, 4).map((row) => scoreRow(row))}
 
           {/* Handicaps */}
           <Table.Tr className="scorecardInfo">

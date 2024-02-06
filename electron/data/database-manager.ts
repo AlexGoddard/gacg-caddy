@@ -202,32 +202,29 @@ export const getPayballs = (day: TournamentDay) => {
 
 export const getPlayers = () => {
   const stmt = db.prepare('SELECT * FROM players;');
-
-  const players = [];
-  for (const player of stmt.iterate()) {
-    players.push(player);
-  }
-  return players;
+  return stmt.all();
 };
 
-export const getRounds = () => {
-  const stmt = db.prepare('SELECT * FROM scores;');
-
-  const rounds = [];
-  for (const score of stmt.iterate()) {
-    const existingRoundIndex = rounds.findIndex(
-      (existingRound) =>
-        existingRound.playerId === score.playerId && existingRound.day === score.day,
-    );
-    if (existingRoundIndex !== -1) {
-      rounds[existingRoundIndex].grossHoles[score.holeNumber - 1] = score.gross;
-    } else {
-      const initialGrossHoles = new Array(18).fill(0);
-      initialGrossHoles[score.holeNumber - 1] = score.gross;
-      rounds.push({ playerId: score.playerId, day: score.day, grossHoles: initialGrossHoles });
-    }
-  }
-  return rounds;
+export const getRounds = (day: TournamentDay) => {
+  const stmt = db.prepare(`
+    SELECT players.id, fullName, SUM(gross) as gross, SUM(net) as net
+    FROM scoresWithNet
+      JOIN players ON scoresWithNet.playerId = players.id
+    ${day !== TournamentDay.ALL ? 'WHERE day=@day' : ''}
+    GROUP BY scoresWithNet.playerId;
+  `);
+  return stmt
+    .all({ day: day })
+    .map((round: { id: number; fullName: string; gross: number; net: number }) => {
+      return {
+        player: {
+          id: round.id,
+          name: round.fullName,
+        },
+        gross: round.gross,
+        net: round.net,
+      };
+    });
 };
 
 export const saveRound = (round: Round) => {
@@ -246,6 +243,30 @@ export const saveRound = (round: Round) => {
   } catch {
     return false;
   }
+};
+
+export const getScores = (day: TournamentDay, scoreType: ScoreType, playerId: number) => {
+  const scoresQuery = db.prepare(`
+    SELECT ${scoreType} as score
+    FROM scoresWithNet
+    WHERE day=@day AND playerId=@playerId
+    ORDER BY holeNumber;
+  `);
+  const daysToFetch =
+    day === TournamentDay.ALL
+      ? [TournamentDay.FRIDAY, TournamentDay.SATURDAY, TournamentDay.SUNDAY]
+      : [day];
+  return daysToFetch.map((dayToFetch) => {
+    const scores = scoresQuery
+      .all({ day: dayToFetch, playerId: playerId })
+      .map((hole: { score: number }) => hole.score);
+    if (scores.length !== 0) {
+      return {
+        day: dayToFetch,
+        scores: scores,
+      };
+    }
+  });
 };
 
 export const populateDatabase = () => {

@@ -3,14 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { ScoreType, TournamentDay } from 'components/constants';
 import { get, post } from 'util/network';
 
-export interface CalcuttaPlayerInfo {
+export interface PlayerInfo {
   id: number;
   name: string;
 }
 
 export interface CalcuttaTeam {
-  a: CalcuttaPlayerInfo;
-  b: CalcuttaPlayerInfo;
+  a: PlayerInfo;
+  b: PlayerInfo;
   gross: number;
   net: number;
 }
@@ -29,6 +29,17 @@ export interface Payball {
 export interface Payballs {
   scoreType: ScoreType;
   payballs: Payball[];
+}
+
+export interface PlayerRound {
+  player: PlayerInfo;
+  gross: number;
+  net: number;
+}
+
+export interface PlayerScores {
+  day: TournamentDay;
+  scores: number[];
 }
 
 export interface Round {
@@ -91,6 +102,15 @@ export const useDeuces = (day: TournamentDay) =>
 export const usePayballs = (day: TournamentDay) =>
   useQuery({ queryKey: ['payballs', day], queryFn: () => fetchPayballs(day) });
 
+export const useRounds = (day: TournamentDay) =>
+  useQuery({ queryKey: ['rounds', day], queryFn: () => fetchRounds(day) });
+
+export const useScores = (day: TournamentDay, scoreType: ScoreType, playerId: number) =>
+  useQuery({
+    queryKey: ['scores', day, scoreType, playerId],
+    queryFn: () => fetchScores(day, scoreType, playerId),
+  });
+
 function fetchCalcutta(day: TournamentDay): Promise<CalcuttaTeam[]> {
   return get('/calcutta', { day: day }).then((calcutta) => calcutta);
 }
@@ -119,4 +139,18 @@ function fetchDeuces(day: TournamentDay): Promise<Deuce[]> {
 
 function fetchPayballs(day: TournamentDay): Promise<Payballs[]> {
   return get('/payballs', { day: day }).then((payballs) => payballs);
+}
+
+function fetchRounds(day: TournamentDay): Promise<PlayerRound[]> {
+  return get('/rounds', { day: day }).then((rounds) => rounds);
+}
+
+function fetchScores(
+  day: TournamentDay,
+  scoreType: ScoreType,
+  playerId: number,
+): Promise<PlayerScores[]> {
+  return get('/scores', { day: day, scoreType: scoreType, playerId: playerId }).then(
+    (scores) => scores,
+  );
 }

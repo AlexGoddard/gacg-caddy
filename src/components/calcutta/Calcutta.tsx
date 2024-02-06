@@ -1,44 +1,18 @@
 import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
-import {
-  ActionIcon,
-  Box,
-  Group,
-  GroupProps,
-  Paper,
-  Stack,
-  StackProps,
-  TableProps,
-  Text,
-  Title,
-} from '@mantine/core';
-import { IconDownload, IconGolfOff, IconTrophy } from '@tabler/icons-react';
+import { ActionIcon, Box, Group, Paper, Stack, StackProps } from '@mantine/core';
+import { IconDownload, IconGolfOff } from '@tabler/icons-react';
+import { useQueries } from '@tanstack/react-query';
 
-import { Scorecard } from './Scorecard';
+import { CalcuttaScorecard, CalcuttaScorecardData } from 'components/calcutta/CalcuttaScorecard';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
+import { Place, Podium } from 'components/common/Podium';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
 import { sum, getTournamentDay, getTournamentYear } from 'components/util';
-import {
-  CalcuttaPlayerInfo,
-  CalcuttaTeam,
-  useCalcuttaQuery,
-  useCalcuttaSampleQuery,
-} from 'hooks/rounds';
+import { CalcuttaTeam, useCalcuttaQuery, useCalcuttaSampleQuery } from 'hooks/rounds';
 
 import './style.less';
-import { useQueries } from '@tanstack/react-query';
-
-interface ScorecardData {
-  day: TournamentDay;
-  scoreType: ScoreType;
-  a: CalcuttaPlayerInfo;
-  b: CalcuttaPlayerInfo;
-}
-
-export interface ScorecardProps extends Omit<TableProps, 'data'> {
-  data: ScorecardData;
-}
 
 interface CalcuttaTableData {
   gross: CalcuttaTeamData[];
@@ -46,11 +20,11 @@ interface CalcuttaTableData {
 }
 
 interface CalcuttaTeamData {
-  id?: number;
+  id: number;
   aPlayer: string;
   bPlayer: string;
   score: number;
-  scorecardData: ScorecardData;
+  scorecardData: CalcuttaScorecardData;
 }
 
 interface CalcuttaWinner {
@@ -62,19 +36,6 @@ interface CalcuttaWinner {
   scoreType: ScoreType;
 }
 
-interface Place {
-  number: number;
-  score: number;
-  winnings: number;
-  winners: string[];
-}
-
-interface PlaceProps extends Place, GroupProps {}
-
-interface PodiumProps extends StackProps {
-  places: Place[];
-}
-
 interface CalcuttaTableProps extends StackProps {
   scoreType: ScoreType;
   records: CalcuttaTeamData[];
@@ -83,6 +44,9 @@ interface CalcuttaTableProps extends StackProps {
 export function Calcutta() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
   const [prizePool, setPrizePool] = useState<string | number>(5000);
+
+  const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
+  const grossPayouts = [0.1, 0.05].map((percent) => percent * Number(prizePool));
 
   const isSample = tournamentDay !== TournamentDay.SUNDAY;
   const [calcuttaQuery, calcuttaSampleQuery] = useQueries({
@@ -143,8 +107,6 @@ export function Calcutta() {
 
   const getWinners = () => {
     const winners: CalcuttaWinner[] = [];
-    const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
-    const grossPayouts = [0.1, 0.05].map((percent) => percent * Number(prizePool));
 
     // The number of teams who have already placed
     let netPlaced = 0;
@@ -278,86 +240,22 @@ export function Calcutta() {
   }
 
   const getPlaces = (scoreType: ScoreType, winners: CalcuttaWinner[]) => {
-    const availablePlaces = scoreType === ScoreType.NET ? [1, 2, 3, 4, 5] : [1, 2, 3];
-    return availablePlaces
-      .map((place) => {
-        const filteredWinners = winners.filter(
-          (winner) => winner.scoreType === scoreType && winner.place === place,
-        );
-        if (filteredWinners.length > 0) {
-          return {
-            number: place,
-            score: filteredWinners[0].score,
-            winnings: Math.floor(filteredWinners[0].amount / 5) * 5,
-            winners: filteredWinners.map((winner) => `${winner.aPlayer} & ${winner.bPlayer}`),
-          };
-        }
-      })
-      .filter((place): place is Place => !!place);
-  };
-
-  const Trophy = ({ place }: { place: number }) => {
-    const iconSize = '2.125rem';
-    const trophyClass = 'trophy';
-    switch (place) {
-      case 1:
-        return <IconTrophy size={iconSize} color="#FFD700" className={trophyClass} />;
-      case 2:
-        return <IconTrophy size={iconSize} color="#C0C0C0" className={trophyClass} />;
-      case 3:
-        return <IconTrophy size={iconSize} color="#CD7F32" className={trophyClass} />;
-      default:
-        return (
-          <Title order={2} className={trophyClass}>
-            {place}
-          </Title>
-        );
+    const places: Place[] = [];
+    const availablePlaces = scoreType === ScoreType.NET ? netPayouts.length : grossPayouts.length;
+    for (let place = 1; place <= availablePlaces; place++) {
+      const filteredWinners = winners.filter(
+        (winner) => winner.scoreType === scoreType && winner.place === place,
+      );
+      if (filteredWinners.length > 0) {
+        places.push({
+          number: place,
+          score: filteredWinners[0].score,
+          winnings: Math.floor(filteredWinners[0].amount / 5) * 5,
+          winners: filteredWinners.map((winner) => `${winner.aPlayer} & ${winner.bPlayer}`),
+        });
+      }
     }
-  };
-
-  const Place = (props: PlaceProps) => {
-    const { number, score, winnings, winners, ...otherProps } = props;
-
-    return (
-      <Group align="flex-start" {...otherProps}>
-        <Trophy place={number} />
-        <Stack ta="left" gap={0}>
-          <Text fw="bold" fz="lg">
-            {score}{' '}
-            <Text span inherit c="indigo">
-              (${winnings})
-            </Text>
-          </Text>
-
-          {winners.map((winner) => (
-            <Text fz="lg" key={`winner-${winner}`}>
-              {winner}
-            </Text>
-          ))}
-        </Stack>
-      </Group>
-    );
-  };
-
-  const Podium = (props: PodiumProps) => {
-    const { title, places, ...otherProps } = props;
-
-    return (
-      <Stack {...otherProps}>
-        <Title order={3}>{title}</Title>
-        <Paper withBorder shadow="lg" p="xl" gap="lg" component={Stack}>
-          {places.map((place) => (
-            <Place
-              number={place.number}
-              score={place.score}
-              winnings={place.winnings}
-              winners={place.winners}
-              key={`place-${place.number}`}
-            />
-          ))}
-        </Paper>
-      </Stack>
-    );
+    return places;
   };
 
   const CalcuttaTable = (props: CalcuttaTableProps) => {
@@ -406,7 +304,14 @@ export function Calcutta() {
                 animateOpacity: false,
                 transitionTimingFunction: 'ease-out',
               },
-              content: ({ record }) => <Scorecard data={record.scorecardData} />,
+              content: ({ record }) => (
+                <CalcuttaScorecard
+                  day={record.scorecardData.day}
+                  scoreType={record.scorecardData.scoreType}
+                  a={record.scorecardData.a}
+                  b={record.scorecardData.b}
+                />
+              ),
             }}
           />
         </Paper>

@@ -90,10 +90,14 @@ ipcMain.handle('/players/get', () => {
   return dbm.getPlayers();
 });
 
-ipcMain.handle('/rounds/get', () => {
-  return dbm.getRounds();
+ipcMain.handle('/rounds/get', (_, args) => {
+  return dbm.getRounds(args.day);
 });
 
 ipcMain.handle('/rounds/post', (_, args) => {
   return dbm.saveRound(args.round);
+});
+
+ipcMain.handle('/scores/get', (_, args) => {
+  return dbm.getScores(args.day, args.scoreType, args.playerId);
 });
