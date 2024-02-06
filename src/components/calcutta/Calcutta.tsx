@@ -18,24 +18,26 @@ import { Scorecard } from './Scorecard';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
-import { sum, getTournamentDay } from 'components/util';
-import { CalcuttaTeam, useCalcutta, useDownloadCalcutta } from 'hooks/rounds';
+import { sum, getTournamentDay, getTournamentYear } from 'components/util';
+import {
+  CalcuttaPlayerInfo,
+  CalcuttaTeam,
+  useCalcuttaQuery,
+  useCalcuttaSampleQuery,
+} from 'hooks/rounds';
 
 import './style.less';
+import { useQueries } from '@tanstack/react-query';
 
 interface ScorecardData {
-  a: PlayerData;
-  b: PlayerData;
-  teamScores: number[];
+  day: TournamentDay;
+  scoreType: ScoreType;
+  a: CalcuttaPlayerInfo;
+  b: CalcuttaPlayerInfo;
 }
 
 export interface ScorecardProps extends Omit<TableProps, 'data'> {
   data: ScorecardData;
-}
-
-interface PlayerData {
-  name: string;
-  scores: number[];
 }
 
 interface CalcuttaTableData {
@@ -83,14 +85,56 @@ export function Calcutta() {
   const [prizePool, setPrizePool] = useState<string | number>(5000);
 
   const isSample = tournamentDay !== TournamentDay.SUNDAY;
-  const { isSuccess, data } = useCalcutta(tournamentDay);
-  const calcuttaFiles = useDownloadCalcutta(isSample);
-  const calcutta = isSuccess ? data : [];
+  const [calcuttaQuery, calcuttaSampleQuery] = useQueries({
+    queries: [useCalcuttaQuery(tournamentDay), useCalcuttaSampleQuery(isSample)],
+  });
+  const calcutta = calcuttaQuery.isSuccess ? calcuttaQuery.data : [];
 
   const calcuttaTableData = getCalcuttaTableData(calcutta);
 
   const downloadCalcutta = () => {
-    calcuttaFiles.download();
+    const calcuttaFileData = [];
+    if (isSample) {
+      const HEADERS = [
+        'A Player',
+        'Handicap',
+        'Friday Gross',
+        'Friday Net',
+        'Saturday Gross',
+        'Saturday Net',
+        'B Player',
+        'Handicap',
+        'Friday Gross',
+        'Friday Net',
+        'Saturday Gross',
+        'Saturday Net',
+        'Team Friday Gross',
+        'Team Friday Net',
+        'Team Saturday Gross',
+        'Team Saturday Net',
+      ];
+      calcuttaFileData.push(HEADERS);
+      const calcuttaSample = calcuttaSampleQuery.isSuccess ? calcuttaSampleQuery.data : [];
+      calcuttaSample.map((calcuttaTeam) => calcuttaFileData.push(calcuttaTeam));
+    } else {
+      const HEADERS = ['A Player', 'B Player', 'Gross', 'Net'];
+      calcuttaFileData.push(HEADERS);
+      calcutta.map((calcuttaTeam) => {
+        calcuttaFileData.push([
+          calcuttaTeam.a.name,
+          calcuttaTeam.b.name,
+          calcuttaTeam.gross,
+          calcuttaTeam.net,
+        ]);
+      });
+    }
+    const calcuttaFile = new Blob([calcuttaFileData.map((row) => row.join(',')).join('\n')], {
+      type: 'text/csv',
+    });
+    const element = document.createElement('a');
+    element.href = URL.createObjectURL(calcuttaFile);
+    element.download = `calcutta-${isSample ? 'sample-' : ''}${getTournamentYear()}.csv`;
+    element.click();
   };
 
   const getWinnings = (payouts: number[], teamsAlreadyPlaced: number, numTeams: number) => {
@@ -214,17 +258,12 @@ export function Calcutta() {
           id: index,
           aPlayer: calcuttaTeam.a.name,
           bPlayer: calcuttaTeam.b.name,
-          score: sum(calcuttaTeam[scoreType]),
+          score: calcuttaTeam[scoreType],
           scorecardData: {
-            a: {
-              name: calcuttaTeam.a.name,
-              scores: calcuttaTeam.a[scoreType] ? calcuttaTeam.a[scoreType]! : [],
-            },
-            b: {
-              name: calcuttaTeam.b.name,
-              scores: calcuttaTeam.b[scoreType] ? calcuttaTeam.b[scoreType]! : [],
-            },
-            teamScores: calcuttaTeam[scoreType],
+            day: tournamentDay,
+            scoreType: scoreType,
+            a: calcuttaTeam.a,
+            b: calcuttaTeam.b,
           },
         });
       });
@@ -358,6 +397,9 @@ export function Calcutta() {
               },
             ]}
             records={records}
+            fetching={calcuttaQuery.isPending}
+            loaderType="bars"
+            loaderColor="indigo"
             rowExpansion={{
               collapseProps: {
                 transitionDuration: 400,
@@ -384,6 +426,7 @@ export function Calcutta() {
         <Group>
           <PrizePoolInput labelId="calcuttaPrizePool" value={prizePool} onChange={setPrizePool} />
           <ActionIcon
+            disabled={isSample ? !calcuttaSampleQuery.isSuccess : !calcuttaQuery.isSuccess}
             variant="gradient"
             aria-label="Download calcutta"
             gradient={DEFAULT_GRADIENT}

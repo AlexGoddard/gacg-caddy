@@ -1,10 +1,16 @@
 import { ScoreType } from './constants';
 
 export interface CalcuttaTeam {
-  a: CalcuttaPlayerData;
-  b: CalcuttaPlayerData;
-  gross?: number[];
-  net?: number[];
+  a: PlayerInfo;
+  b: PlayerInfo;
+  gross: number;
+  net: number;
+}
+
+export interface CalcuttaTeamHoles {
+  a: number[];
+  b: number[];
+  team: number[];
 }
 
 export interface Payballs {
@@ -18,11 +24,9 @@ export interface Round {
   grossHoles: number[];
 }
 
-interface CalcuttaPlayerData {
+interface PlayerInfo {
   id: number;
   name: string;
-  gross?: number[];
-  net?: number[];
 }
 
 interface Payball {

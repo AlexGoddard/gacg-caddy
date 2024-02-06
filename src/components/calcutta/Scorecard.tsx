@@ -1,8 +1,11 @@
 import { ReactNode } from 'react';
-import { Indicator, Skeleton, Table } from '@mantine/core';
+import { Box, Flex, Indicator, LoadingOverlay, Overlay, Table, Title } from '@mantine/core';
+import { useQueries } from '@tanstack/react-query';
 
 import { ScorecardProps } from 'components/calcutta/Calcutta';
-import { useHoles } from 'hooks/holes';
+import { useHolesQuery } from 'hooks/holes';
+import { useCalcuttaTeamHolesQuery } from 'hooks/rounds';
+import { sum } from 'components/util';
 
 interface HoleHeaders {
   numbers: ReactNode[];
@@ -12,8 +15,19 @@ interface HoleHeaders {
 
 export const Scorecard = (props: ScorecardProps) => {
   const { data, ...otherProps } = props;
-  const { isSuccess, isPending, data: holeData } = useHoles();
-  const holes = isSuccess ? holeData : [];
+  const [calcuttaTeamHolesQuery, holesQuery] = useQueries({
+    queries: [
+      useCalcuttaTeamHolesQuery(data.day, data.scoreType, data.a.id, data.b.id),
+      useHolesQuery,
+    ],
+  });
+  const calcuttaTeamHoles = calcuttaTeamHolesQuery.isSuccess
+    ? calcuttaTeamHolesQuery.data
+    : { a: [], b: [], team: [] };
+  const holes = holesQuery.isSuccess ? holesQuery.data : [];
+
+  const isPending = calcuttaTeamHolesQuery.isPending || holesQuery.isPending;
+  const isError = calcuttaTeamHolesQuery.isError || holesQuery.isError;
 
   const holeHeaders: HoleHeaders = {
     numbers: [],
@@ -39,7 +53,7 @@ export const Scorecard = (props: ScorecardProps) => {
   const scoreRows = (name: string, scores: number[], isPlayerScore = true) => {
     const scoreElements = scores.map((holeScore, holeIndex) => (
       <Table.Td key={`${name}-hole-${holeIndex + 1}-score`}>
-        {isPlayerScore && data.teamScores[holeIndex] === holeScore ? (
+        {isPlayerScore && calcuttaTeamHoles.team[holeIndex] === holeScore ? (
           <Indicator size={4} color="green.7" zIndex={1}>
             {holeScore}
           </Indicator>
@@ -48,20 +62,29 @@ export const Scorecard = (props: ScorecardProps) => {
         )}
       </Table.Td>
     ));
+    const outScore = sum(scores.slice(0, 9));
+    const inScore = sum(scores.slice(-9));
+    const totalScore = sum(scores);
     return (
       <Table.Tr key={`${name}-table-row`}>
         <Table.Td className="leftLabel">{name}</Table.Td>
         {scoreElements.slice(0, 9)}
-        <Table.Td>{scores.slice(0, 9).reduce((sum, current) => sum + current, 0)}</Table.Td>
+        <Table.Td>{outScore !== 0 && outScore}</Table.Td>
         {scoreElements.slice(-9)}
-        <Table.Td>{scores.slice(-9).reduce((sum, current) => sum + current, 0)}</Table.Td>
-        <Table.Td>{scores.reduce((sum, current) => sum + current, 0)}</Table.Td>
+        <Table.Td>{inScore !== 0 && inScore}</Table.Td>
+        <Table.Td>{totalScore !== 0 && totalScore}</Table.Td>
       </Table.Tr>
     );
   };
 
   return (
-    <Skeleton visible={isPending} className="scorecardSkeleton">
+    <Box pos="relative">
+      <LoadingOverlay
+        visible={isPending}
+        zIndex={1000}
+        overlayProps={{ color: '#000', backgroundOpacity: 0.3, blur: 4 }}
+        loaderProps={{ color: 'indigo', type: 'bars' }}
+      />
       <Table p="md" bg="dark.9" className="scorecard" {...otherProps}>
         <Table.Tbody>
           {/* Headers */}
@@ -71,14 +94,14 @@ export const Scorecard = (props: ScorecardProps) => {
             <Table.Td>Out</Table.Td>
             {holeHeaders.numbers.slice(-9)}
             <Table.Td>IN</Table.Td>
-            <Table.Td>TOT</Table.Td>
+            <Table.Td tt="uppercase">{data.scoreType}</Table.Td>
           </Table.Tr>
 
           {/* A Player Scores */}
-          {scoreRows(data.a.name, data.a.scores)}
+          {scoreRows(data.a.name, calcuttaTeamHoles.a)}
 
           {/* B Player Scores */}
-          {scoreRows(data.b.name, data.b.scores)}
+          {scoreRows(data.b.name, calcuttaTeamHoles.b)}
 
           {/* Pars */}
           <Table.Tr className="scorecardInfo">
@@ -93,7 +116,7 @@ export const Scorecard = (props: ScorecardProps) => {
           </Table.Tr>
 
           {/* Team Scores */}
-          {scoreRows('Team', data.teamScores, false)}
+          {scoreRows('Team', calcuttaTeamHoles.team, false)}
 
           {/* Handicaps */}
           <Table.Tr className="scorecardInfo">
@@ -108,6 +131,13 @@ export const Scorecard = (props: ScorecardProps) => {
           </Table.Tr>
         </Table.Tbody>
       </Table>
-    </Skeleton>
+      {isError && (
+        <Overlay color="#000" backgroundOpacity={0.4} blur={5}>
+          <Flex justify="center" align="center" h="100%">
+            <Title order={2}>Failed to load scorecard</Title>
+          </Flex>
+        </Overlay>
+      )}
+    </Box>
   );
 };

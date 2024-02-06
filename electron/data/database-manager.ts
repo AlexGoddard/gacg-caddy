@@ -3,32 +3,39 @@ import fs from 'fs';
 import path from 'node:path';
 
 import { ScoreType, TournamentDay } from '../constants';
-import { CalcuttaTeam, Payballs, Round } from '../interface';
+import { CalcuttaTeam, CalcuttaTeamHoles, Payballs, Round } from '../interface';
 
 const DB_PATH = path.join(app.getPath('userData'), 'gacg.sqlite');
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const Database = require('better-sqlite3');
 const db = new Database(DB_PATH);
 
-export const getCalcutta = (day: TournamentDay) => {
-  const calcuttaTeamsStmt = db.prepare(
+export const getCalcutta = (day: TournamentDay): CalcuttaTeam[] => {
+  const calcuttaTeamsQuery = db.prepare(
     `
-    SELECT aPlayerId, aPlayers.fullName AS aFullName, bPlayerId, bPlayers.fullName AS bFullName
+    SELECT aPlayerId, bPlayerId, aPlayers.fullName AS aFullName, bPlayers.fullName AS bFullName
     FROM calcuttaTeams
-    JOIN players aPlayers ON aPlayerId=aPlayers.id
-    JOIN players bPlayers ON bPlayerId=bPlayers.id;
-    `,
+      JOIN players aPlayers ON aPlayerId=aPlayers.id
+      JOIN players bPlayers ON bPlayerId=bPlayers.id;`,
   );
-  const calcuttaTeams: CalcuttaTeam[] = calcuttaTeamsStmt
+  const grossCalcuttaQuery = db.prepare(calcuttaQueryString(ScoreType.GROSS));
+  const netCalcuttaQuery = db.prepare(calcuttaQueryString(ScoreType.NET));
+  return calcuttaTeamsQuery
     .all()
     .map(
       (calcuttaTeam: {
         aPlayerId: number;
-        aFullName: string;
         bPlayerId: number;
+        aFullName: string;
         bFullName: string;
       }) => {
-        const teamData: CalcuttaTeam = {
+        const queryParams = {
+          day: day,
+          aPlayerId: calcuttaTeam.aPlayerId,
+          bPlayerId: calcuttaTeam.bPlayerId,
+        };
+        return {
           a: {
             id: calcuttaTeam.aPlayerId,
             name: calcuttaTeam.aFullName,
@@ -37,61 +44,100 @@ export const getCalcutta = (day: TournamentDay) => {
             id: calcuttaTeam.bPlayerId,
             name: calcuttaTeam.bFullName,
           },
+          gross: grossCalcuttaQuery.get(queryParams).score,
+          net: netCalcuttaQuery.get(queryParams).score,
         };
-        Object.values(ScoreType).forEach((scoreType) => {
-          const aStmt = db.prepare(
-            `
-        SELECT ${scoreType}
-        FROM scoresWithNet
-        WHERE day=@day AND playerId=@a
-        ORDER BY holeNumber;
-        `,
-          );
-          const bStmt = db.prepare(
-            `
-        SELECT ${scoreType}
-        FROM scoresWithNet
-        WHERE day=@day AND playerId=@b
-        ORDER BY holeNumber;
-        `,
-          );
-          const teamStmt = db.prepare(
-            `
-        SELECT MIN(${scoreType}) as ${scoreType} 
-        FROM scoresWithNet
-        WHERE day=@day AND playerId IN (@a, @b)
-        GROUP BY holeNumber
-        ORDER BY holeNumber
-        `,
-          );
-          teamData[scoreType] = teamStmt
-            .all({
-              day: day,
-              a: calcuttaTeam.aPlayerId,
-              b: calcuttaTeam.bPlayerId,
-            })
-            .map((data: { gross?: number[]; net?: number[] }) => data[scoreType]);
-          teamData.a[scoreType] = aStmt
-            .all({ day: day, a: calcuttaTeam.aPlayerId })
-            .map((data: { gross?: number[]; net?: number[] }) => data[scoreType]);
-          teamData.b[scoreType] = bStmt
-            .all({ day: day, b: calcuttaTeam.bPlayerId })
-            .map((data: { gross?: number[]; net?: number[] }) => data[scoreType]);
-        });
-        return teamData;
       },
     );
-  return calcuttaTeams;
 };
 
-export const getCalcuttaTeams = () => {
-  const stmt = db.prepare('SELECT * FROM calcuttaTeams;');
+export const getCalcuttaSample = () => {
+  const calcuttaTeamsQuery = db.prepare('SELECT aPlayerId, bPlayerId FROM calcuttaTeams');
+  const playerDataQuery = db.prepare(`
+        WITH
+        fridayScores
+          AS (SELECT playerId, SUM(gross) as fridayGross, SUM(net) as fridayNet
+              FROM scoresWithNet
+              WHERE day='friday' AND playerId=@playerId),
+        saturdayScores
+          AS (SELECT SUM(gross) as saturdayGross, SUM(net) as saturdayNet
+              FROM scoresWithNet
+              WHERE day='saturday' AND playerId=@playerId)
+        SELECT fullName, handicap, fridayGross, fridayNet, saturdayGross, saturdayNet
+        FROM fridayScores, saturdayScores
+          JOIN players ON fridayScores.playerId = players.id;
+      `);
+  const teamDataQuery = db.prepare(`
+        WITH
+        fridaySum
+          AS (WITH fridayScores
+                AS (SELECT MIN(gross) as fridayGross, MIN(net) as fridayNet
+                    FROM scoresWithNet
+                    WHERE day='friday' AND playerId IN (@aPlayerId, @bPlayerId)
+                    GROUP BY holeNumber)
+              SELECT SUM(fridayGross) as fridayGross, SUM(fridayNet) as fridayNet
+              FROM fridayScores),
+        saturdaySum
+          AS (WITH saturdayScores
+                AS (SELECT MIN(gross) as saturdayGross, MIN(net) as saturdayNet
+                    FROM scoresWithNet
+                    WHERE day='saturday' AND playerId IN (@aPlayerId, @bPlayerId)
+                    GROUP BY holeNumber)
+              SELECT SUM(saturdayGross) as saturdayGross, SUM(saturdayNet) as saturdayNet
+              FROM saturdayScores)
+        SELECT *
+        FROM fridaySum, saturdaySum;
+      `);
+  return calcuttaTeamsQuery.all().map((calcuttaTeam: { aPlayerId: number; bPlayerId: number }) => {
+    const aPlayerData = playerDataQuery.get({ playerId: calcuttaTeam.aPlayerId });
+    const bPlayerData = playerDataQuery.get({ playerId: calcuttaTeam.bPlayerId });
+    const teamData = teamDataQuery.get({
+      aPlayerId: calcuttaTeam.aPlayerId,
+      bPlayerId: calcuttaTeam.bPlayerId,
+    });
+    return [
+      // A Player
+      aPlayerData.fullName,
+      aPlayerData.handicap,
+      aPlayerData.fridayGross,
+      aPlayerData.fridayNet,
+      aPlayerData.saturdayGross,
+      aPlayerData.saturdayNet,
+      // B Player
+      bPlayerData.fullName,
+      bPlayerData.handicap,
+      bPlayerData.fridayGross,
+      bPlayerData.fridayNet,
+      bPlayerData.saturdayGross,
+      bPlayerData.saturdayNet,
+      // Team
+      teamData.fridayGross,
+      teamData.fridayNet,
+      teamData.saturdayGross,
+      teamData.saturdayNet,
+    ];
+  });
+};
 
-  const calcuttaTeams = [];
-  for (const calcuttaTeam of stmt.iterate()) {
-    calcuttaTeams.push({ a: calcuttaTeam.aPlayerId, b: calcuttaTeam.bPlayerId });
-  }
-  return calcuttaTeams;
+export const getCalcuttaTeamHoles = (
+  day: TournamentDay,
+  scoreType: ScoreType,
+  aPlayerId: number,
+  bPlayerId: number,
+): CalcuttaTeamHoles => {
+  const playerHolesQuery = db.prepare(playerHolesQueryString(scoreType));
+  const teamHolesQuery = db.prepare(calcuttaTeamHolesQueryString(scoreType));
+  return {
+    a: playerHolesQuery
+      .all({ day: day, playerId: aPlayerId })
+      .map((hole: { score: number }) => hole.score),
+    b: playerHolesQuery
+      .all({ day: day, playerId: bPlayerId })
+      .map((hole: { score: number }) => hole.score),
+    team: teamHolesQuery
+      .all({ day: day, aPlayerId: aPlayerId, bPlayerId: bPlayerId })
+      .map((hole: { score: number }) => hole.score),
+  };
 };
 
 export const getDeuces = (day: TournamentDay) => {
@@ -218,7 +264,7 @@ export const populateDatabase = () => {
 
   // players
   db.exec(
-    'CREATE TABLE players (id INTEGER PRIMARY KEY AUTOINCREMENT,lastName TEXT,firstName TEXT,division TEXT,handicap INTEGER);',
+    'CREATE TABLE players (id INTEGER PRIMARY KEY AUTOINCREMENT,lastName TEXT,firstName TEXT,fullName TEXT GENERATED ALWAYS AS (firstName || " " || lastName),division TEXT,handicap INTEGER);',
   );
   const playerData = JSON.parse(
     fs.readFileSync(path.join(app.getPath('userData'), 'players.json'), 'utf-8'),
@@ -267,3 +313,34 @@ export const populateDatabase = () => {
   });
   insertManyCalcuttaTeams(calcuttaTeamsData.calcuttaTeams);
 };
+
+function calcuttaQueryString(scoreType: ScoreType) {
+  return `
+    WITH calcuttaHoleScores
+      AS (SELECT MIN(${scoreType}) as score
+          FROM scoresWithNet
+          WHERE day=@day AND playerId IN (@aPlayerId, @bPlayerId)
+          GROUP BY holeNumber)
+    SELECT SUM(score) as score
+    FROM calcuttaHoleScores;
+  `;
+}
+
+function calcuttaTeamHolesQueryString(scoreType: ScoreType) {
+  return `
+    SELECT MIN(${scoreType}) as score
+    FROM scoresWithNet
+    WHERE day=@day AND playerId IN (@aPlayerId, @bPlayerId)
+    GROUP BY holeNumber
+    ORDER BY holeNumber
+  `;
+}
+
+function playerHolesQueryString(scoreType: ScoreType) {
+  return `
+    SELECT ${scoreType} as score
+    FROM scoresWithNet
+    WHERE day=@day AND playerId=@playerId
+    ORDER BY holeNumber;
+  `;
+}

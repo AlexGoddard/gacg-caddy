@@ -66,8 +66,12 @@ ipcMain.handle('/calcutta/get', (_, args) => {
   return dbm.getCalcutta(args.day);
 });
 
-ipcMain.handle('/calcutta-teams/get', () => {
-  return dbm.getCalcuttaTeams();
+ipcMain.handle('/calcutta/sample/get', () => {
+  return dbm.getCalcuttaSample();
+});
+
+ipcMain.handle('/calcutta/teams/holes/get', (_, args) => {
+  return dbm.getCalcuttaTeamHoles(args.day, args.scoreType, args.aPlayerId, args.bPlayerId);
 });
 
 ipcMain.handle('/deuces/get', (_, args) => {
