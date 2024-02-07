@@ -1,4 +1,17 @@
 {
   "printWidth": 100,
-  "singleQuote": true
+  "singleQuote": true,
+  "importOrder": [
+    "^(react|react-dom|react-router-dom)$",
+    "<THIRD_PARTY_MODULES>",
+    "^components/(.*)$",
+    "^hooks/(.*)$",
+    "^util/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ]
 }

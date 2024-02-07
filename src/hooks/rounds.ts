@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { ScoreType, TournamentDay } from 'components/constants';
+
 import { get, post } from 'util/network';
 
 export interface PlayerInfo {
@@ -57,22 +58,18 @@ interface CalcuttaTeamHoles {
 export const saveRound = (newRound: Round): Promise<boolean> =>
   post('/rounds', { round: newRound }).then((response) => response);
 
-export const useCalcuttaQuery = (day: TournamentDay) => {
-  return {
-    queryKey: ['calcutta', day],
-    queryFn: () => fetchCalcutta(day),
-  };
-};
+export const useCalcuttaQuery = (day: TournamentDay) => ({
+  queryKey: ['calcutta', day],
+  queryFn: () => fetchCalcutta(day),
+});
 
 export const useCalcutta = (day: TournamentDay) => useQuery(useCalcuttaQuery(day));
 
-export const useCalcuttaSampleQuery = (isEnabled: boolean) => {
-  return {
-    queryKey: ['calcutta/sample'],
-    queryFn: fetchCalcuttaSample,
-    enabled: isEnabled,
-  };
-};
+export const useCalcuttaSampleQuery = (isEnabled: boolean) => ({
+  queryKey: ['calcutta/sample'],
+  queryFn: fetchCalcuttaSample,
+  enabled: isEnabled,
+});
 
 export const useCalcuttaSample = (isEnabled: boolean) =>
   useQuery(useCalcuttaSampleQuery(isEnabled));
@@ -82,12 +79,10 @@ export const useCalcuttaTeamHolesQuery = (
   scoreType: ScoreType,
   aPlayerId: number,
   bPlayerId: number,
-) => {
-  return {
-    queryKey: ['calcutta/teams/holes', day, scoreType, aPlayerId, bPlayerId],
-    queryFn: () => fetchCalcuttaTeamHoles(day, scoreType, aPlayerId, bPlayerId),
-  };
-};
+) => ({
+  queryKey: ['calcutta/teams/holes', day, scoreType, aPlayerId, bPlayerId],
+  queryFn: () => fetchCalcuttaTeamHoles(day, scoreType, aPlayerId, bPlayerId),
+});
 
 export const useCalcuttaTeamHoles = (
   day: TournamentDay,

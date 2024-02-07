@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Routes, Route, HashRouter } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
+
 import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

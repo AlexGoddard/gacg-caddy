@@ -1,4 +1,4 @@
-import { Group, GroupProps, Stack, StackProps, Title, Text, Paper } from '@mantine/core';
+import { Group, GroupProps, Paper, Stack, StackProps, Text, Title } from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
 
 export interface Place {

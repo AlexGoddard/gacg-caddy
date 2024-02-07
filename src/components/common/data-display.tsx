@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+
 import { Paper, Stack, StackProps } from '@mantine/core';
 
 import './style.css';

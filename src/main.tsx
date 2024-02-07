@@ -1,13 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+
 import { MantineProvider } from '@mantine/core';
-import { Notifications } from '@mantine/notifications';
-
-import App from './App.tsx';
-
 import '@mantine/core/styles.css';
+import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import 'mantine-datatable/styles.css';
+import ReactDOM from 'react-dom/client';
+
+import App from './App.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

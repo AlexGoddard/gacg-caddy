@@ -1,15 +1,17 @@
-import JSZip from 'jszip';
-import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
+
 import { ActionIcon, Box, Group, Paper, Stack, StackProps } from '@mantine/core';
 import { IconDownload, IconGolfOff } from '@tabler/icons-react';
+import JSZip from 'jszip';
+import { DataTable } from 'mantine-datatable';
 
-import { DaySelector } from 'components/common/form-inputs';
 import { Place, Podium } from 'components/common/Podium';
+import { DaySelector } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
 import { RoundsScorecard, RoundsScorecardData } from 'components/round/RoundsScorecard';
 import { getTournamentDay, getTournamentYear } from 'components/util';
+
 import { PlayerRound, useRounds } from 'hooks/rounds';
 
 import './style.less';

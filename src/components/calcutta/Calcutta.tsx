@@ -1,15 +1,17 @@
-import { DataTable } from 'mantine-datatable';
 import { useState } from 'react';
+
 import { ActionIcon, Box, Group, Paper, Stack, StackProps } from '@mantine/core';
 import { IconDownload, IconGolfOff } from '@tabler/icons-react';
 import { useQueries } from '@tanstack/react-query';
+import { DataTable } from 'mantine-datatable';
 
 import { CalcuttaScorecard, CalcuttaScorecardData } from 'components/calcutta/CalcuttaScorecard';
-import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { Place, Podium } from 'components/common/Podium';
+import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
-import { sum, getTournamentDay, getTournamentYear } from 'components/util';
+import { getTournamentDay, getTournamentYear, sum } from 'components/util';
+
 import { CalcuttaTeam, useCalcuttaQuery, useCalcuttaSampleQuery } from 'hooks/rounds';
 
 import './style.less';

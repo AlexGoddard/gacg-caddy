@@ -1,7 +1,8 @@
 import { TableProps } from '@mantine/core';
-import { Scorecard } from 'components/common/Scorecard';
 
+import { Scorecard } from 'components/common/Scorecard';
 import { ScoreType, TournamentDay } from 'components/constants';
+
 import { PlayerInfo, useCalcuttaTeamHoles } from 'hooks/rounds';
 
 const PLACEHOLDER_SCORES = new Array(18).fill('');

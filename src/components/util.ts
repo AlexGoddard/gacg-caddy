@@ -1,6 +1,6 @@
 import { useMediaQuery } from '@mantine/hooks';
 
-import { TournamentDay } from './constants';
+import { TournamentDay } from 'components/constants';
 
 export function getTournamentDay() {
   const currentDate = new Date();

@@ -16,6 +16,7 @@ import { IconCurrencyDollar } from '@tabler/icons-react';
 
 import { ErrorFeedback } from 'components/common/feedback';
 import { Division, TournamentDay } from 'components/constants';
+
 import { Hole } from 'hooks/holes';
 import { usePlayers } from 'hooks/players';
 
@@ -102,12 +103,10 @@ export const PlayerInput = (props: SelectProps) => {
   const getPlayerItemsByDivision = (division: Division) =>
     players
       .filter((player) => player.division === division)
-      .map((player) => {
-        return {
-          value: player.id.toString(),
-          label: player.fullName,
-        };
-      });
+      .map((player) => ({
+        value: player.id.toString(),
+        label: player.fullName,
+      }));
 
   return (
     <Group gap="xs">
@@ -115,12 +114,10 @@ export const PlayerInput = (props: SelectProps) => {
         aria-label="Player select"
         placeholder={isPending ? 'Loading players..' : 'Search players..'}
         disabled={!isSuccess}
-        data={Object.values(Division).map((division) => {
-          return {
-            group: `${division.toUpperCase()} Division`,
-            items: getPlayerItemsByDivision(division),
-          };
-        })}
+        data={Object.values(Division).map((division) => ({
+          group: `${division.toUpperCase()} Division`,
+          items: getPlayerItemsByDivision(division),
+        }))}
         comboboxProps={{
           transitionProps: { transition: 'pop', duration: 300 },
         }}

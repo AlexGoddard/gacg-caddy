@@ -1,11 +1,13 @@
-import JSZip from 'jszip';
 import { useState } from 'react';
+
 import { ActionIcon, Group, Stack, Table, Title } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
+import JSZip from 'jszip';
 
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
 import { getTournamentDay, getTournamentYear } from 'components/util';
+
 import { usePayballs } from 'hooks/rounds';
 
 import './style.less';
@@ -22,32 +24,28 @@ export function Payballs() {
   const { isSuccess, data } = usePayballs(tournamentDay);
   const payballs = isSuccess ? data : [];
 
-  const payballTableData = payballs.map((payballData) => {
-    return {
-      scoreType: payballData.scoreType,
-      elementData: {
-        head: HEADERS,
-        body: payballData.payballs.map((payball) => [
-          payball.player,
-          payball.holeNumber.toString(),
-          payball.score.toString(),
-        ]),
-      },
-    };
-  });
+  const payballTableData = payballs.map((payballData) => ({
+    scoreType: payballData.scoreType,
+    elementData: {
+      head: HEADERS,
+      body: payballData.payballs.map((payball) => [
+        payball.player,
+        payball.holeNumber.toString(),
+        payball.score.toString(),
+      ]),
+    },
+  }));
 
-  const payballTables = payballTableData.map((payballData) => {
-    return {
-      scoreType: payballData.scoreType,
-      element: (
-        <Table
-          className="payballsTable"
-          data={payballData.elementData}
-          key={`${payballData.scoreType}-payball-table`}
-        />
-      ),
-    };
-  });
+  const payballTables = payballTableData.map((payballData) => ({
+    scoreType: payballData.scoreType,
+    element: (
+      <Table
+        className="payballsTable"
+        data={payballData.elementData}
+        key={`${payballData.scoreType}-payball-table`}
+      />
+    ),
+  }));
 
   const downloadPayballs = () => {
     const zip = new JSZip();

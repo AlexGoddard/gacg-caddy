@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+
 import {
   Box,
   Flex,
@@ -12,11 +13,12 @@ import {
 
 import { ScoreType } from 'components/constants';
 import { sum } from 'components/util';
+
 import { useHoles } from 'hooks/holes';
 
-const PLACEHOLDER_HOLES = new Array(18).fill(4).map((hole, index) => {
-  return { holeNumber: index, par: hole, handicap: hole };
-});
+const PLACEHOLDER_HOLES = new Array(18)
+  .fill(4)
+  .map((hole, index) => ({ holeNumber: index, par: hole, handicap: hole }));
 
 interface HoleHeaders {
   numbers: ReactNode[];
