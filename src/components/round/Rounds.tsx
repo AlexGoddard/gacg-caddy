@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-import { ActionIcon, Box, Group, Paper, Stack, StackProps } from '@mantine/core';
-import { IconDownload, IconGolfOff } from '@tabler/icons-react';
+import { ActionIcon, Group, Paper, Stack, StackProps } from '@mantine/core';
+import { IconDownload } from '@tabler/icons-react';
 import JSZip from 'jszip';
 import { DataTable } from 'mantine-datatable';
 
 import { Place, Podium } from 'components/common/Podium';
+import { NoRecordsFeedback } from 'components/common/feedback';
 import { DaySelector } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
@@ -120,11 +121,7 @@ export function Rounds() {
             height={470}
             minHeight={150}
             noRecordsText="No results yet"
-            noRecordsIcon={
-              <Box className="noRecordsBox">
-                <IconGolfOff size={24} />
-              </Box>
-            }
+            noRecordsIcon={<NoRecordsFeedback />}
             styles={{
               header: (theme) => ({
                 backgroundColor: theme.colors.dark[8],
@@ -186,7 +183,7 @@ export function Rounds() {
         {tournamentDay === TournamentDay.ALL && (
           <Stack>
             <SectionTitle>Results</SectionTitle>
-            <Group justify="space-around" align="flex-start">
+            <Group gap="xl" align="flex-start">
               <Podium title="Gross" places={getTopThree(ScoreType.GROSS)} />
               <Podium title="Net" places={getTopThree(ScoreType.NET)} />
             </Group>

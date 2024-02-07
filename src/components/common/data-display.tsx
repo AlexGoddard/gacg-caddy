@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 import { Paper, Stack, StackProps } from '@mantine/core';
 
-import './style.css';
+import './style.less';
 
 interface SplitDataProps extends StackProps {
   topSection: ReactNode;

@@ -16,6 +16,8 @@ import { sum } from 'components/util';
 
 import { useHoles } from 'hooks/holes';
 
+import './style.less';
+
 const PLACEHOLDER_HOLES = new Array(18)
   .fill(4)
   .map((hole, index) => ({ holeNumber: index, par: hole, handicap: hole }));

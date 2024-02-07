@@ -1,12 +1,13 @@
 import { useState } from 'react';
 
-import { ActionIcon, Box, Group, Paper, Stack, StackProps } from '@mantine/core';
-import { IconDownload, IconGolfOff } from '@tabler/icons-react';
+import { ActionIcon, Group, Paper, Stack, StackProps } from '@mantine/core';
+import { IconDownload } from '@tabler/icons-react';
 import { useQueries } from '@tanstack/react-query';
 import { DataTable } from 'mantine-datatable';
 
 import { CalcuttaScorecard, CalcuttaScorecardData } from 'components/calcutta/CalcuttaScorecard';
 import { Place, Podium } from 'components/common/Podium';
+import { NoRecordsFeedback } from 'components/common/feedback';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
 import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
@@ -275,11 +276,7 @@ export function Calcutta() {
             borderRadius="4px"
             minHeight={150}
             noRecordsText="No results yet"
-            noRecordsIcon={
-              <Box className="noRecordsBox">
-                <IconGolfOff size={24} />
-              </Box>
-            }
+            noRecordsIcon={<NoRecordsFeedback />}
             styles={{
               header: (theme) => ({
                 backgroundColor: theme.colors.dark[8],
@@ -347,7 +344,7 @@ export function Calcutta() {
         {!isSample && (
           <Stack>
             <SectionTitle>Results</SectionTitle>
-            <Group justify="space-around" align="flex-start">
+            <Group gap="xl" align="flex-start">
               <Podium title="Net" places={getPlaces(ScoreType.NET, winners)} />
               <Podium title="Gross" places={getPlaces(ScoreType.GROSS, winners)} />
             </Group>

@@ -1,7 +1,7 @@
-import { Tooltip, TooltipProps } from '@mantine/core';
-import { IconExclamationCircle } from '@tabler/icons-react';
+import { Box, BoxProps, Tooltip, TooltipProps } from '@mantine/core';
+import { IconExclamationCircle, IconGolfOff } from '@tabler/icons-react';
 
-import './style.css';
+import './style.less';
 
 interface FeedbackProps extends Omit<TooltipProps, 'children'> {}
 
@@ -18,3 +18,9 @@ export const ErrorFeedback = (props: FeedbackProps) => {
     </Tooltip>
   );
 };
+
+export const NoRecordsFeedback = (props: BoxProps) => (
+  <Box className="noRecordsBox" {...props}>
+    <IconGolfOff size={24} />
+  </Box>
+);

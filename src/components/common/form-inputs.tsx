@@ -20,6 +20,8 @@ import { Division, TournamentDay } from 'components/constants';
 import { Hole } from 'hooks/holes';
 import { usePlayers } from 'hooks/players';
 
+import './style.less';
+
 interface DaySelectorProps extends ChipGroupProps {
   days?: TournamentDay[];
 }

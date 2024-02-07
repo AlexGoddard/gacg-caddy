@@ -1,6 +1,8 @@
 import { Group, GroupProps, Paper, Stack, StackProps, Text, Title } from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
 
+import './style.less';
+
 export interface Place {
   number: number;
   score: number;
