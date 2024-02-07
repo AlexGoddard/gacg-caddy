@@ -10,6 +10,7 @@ const DB_PATH = path.join(app.getPath('userData'), 'gacg.sqlite');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Database = require('better-sqlite3');
 const db = new Database(DB_PATH);
+db.pragma('journal_mode = WAL');
 
 export const getCalcutta = (day: TournamentDay): CalcuttaTeam[] => {
   const calcuttaTeamsQuery = db.prepare(
