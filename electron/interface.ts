@@ -1,4 +1,4 @@
-import { ScoreType } from './constants';
+import { Division, ScoreType } from './constants';
 
 export interface CalcuttaTeam {
   a: PlayerInfo;
@@ -11,6 +11,13 @@ export interface CalcuttaTeamHoles {
   a: number[];
   b: number[];
   team: number[];
+}
+
+export interface NewPlayer {
+  firstName: string;
+  lastName: string;
+  division: Division;
+  handicap: number;
 }
 
 export interface Payballs {

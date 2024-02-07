@@ -7,6 +7,7 @@ import {
   IconHome,
   IconPlayCard,
   IconTrophy,
+  IconUser,
 } from '@tabler/icons-react';
 
 import { useDevice } from 'components/util';
@@ -23,6 +24,7 @@ export function Navbar(props: NavbarProps) {
 
   const navLinks = [
     { icon: IconHome, href: '/', label: 'Dashboard' },
+    { icon: IconUser, href: '/players', label: 'Players' },
     { icon: IconGolf, href: '/rounds', label: 'Rounds' },
     { icon: IconCurrencyDollar, href: '/payballs', label: 'Payballs' },
     { icon: IconPlayCard, href: '/deuces', label: 'Deuces' },

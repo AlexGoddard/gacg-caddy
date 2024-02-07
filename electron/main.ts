@@ -86,8 +86,16 @@ ipcMain.handle('/payballs/get', (_, args) => {
   return dbm.getPayballs(args.day);
 });
 
+ipcMain.handle('/players/delete', (_, args) => {
+  return dbm.deletePlayers(args.playerIds);
+});
+
 ipcMain.handle('/players/get', () => {
   return dbm.getPlayers();
+});
+
+ipcMain.handle('/players/post', (_, args) => {
+  return dbm.savePlayer(args.player);
 });
 
 ipcMain.handle('/rounds/get', (_, args) => {

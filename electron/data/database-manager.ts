@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'node:path';
 
 import { ScoreType, TournamentDay } from '../constants';
-import { CalcuttaTeam, CalcuttaTeamHoles, Payballs, Round } from '../interface';
+import { CalcuttaTeam, CalcuttaTeamHoles, NewPlayer, Payballs, Round } from '../interface';
 
 const DB_PATH = path.join(app.getPath('userData'), 'gacg.sqlite');
 
@@ -156,12 +156,7 @@ export const getDeuces = (day: TournamentDay) => {
 
 export const getHoles = () => {
   const stmt = db.prepare('SELECT * FROM holes;');
-
-  const holes = [];
-  for (const hole of stmt.iterate()) {
-    holes.push(hole);
-  }
-  return holes;
+  return stmt.all();
 };
 
 export const getPayballs = (day: TournamentDay) => {
@@ -201,9 +196,43 @@ export const getPayballs = (day: TournamentDay) => {
   return payballs;
 };
 
+export const deletePlayers = (playerIds: number[]) => {
+  try {
+    const deletePlayer = db.prepare(`
+      DELETE FROM players
+      WHERE id=@playerId
+    `);
+    const deleteManyPlayers = db.transaction((playerIds: number[]) => {
+      for (const playerId of playerIds) deletePlayer.run({ playerId: playerId });
+    });
+    deleteManyPlayers(playerIds);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
 export const getPlayers = () => {
   const stmt = db.prepare('SELECT * FROM players;');
   return stmt.all();
+};
+
+export const savePlayer = (player: NewPlayer) => {
+  try {
+    const insertPlayer = db.prepare(`
+      INSERT INTO players (firstName, lastName, division, handicap)
+      VALUES (@firstName, @lastName, @division, @handicap);
+    `);
+    insertPlayer.run(player);
+    const lastInsertedPlayer = db.prepare(`
+      SELECT * FROM players
+      WHERE id = LAST_INSERT_ROWID();
+    `);
+    return lastInsertedPlayer.get();
+  } catch {
+    return;
+  }
 };
 
 export const getRounds = (day: TournamentDay) => {

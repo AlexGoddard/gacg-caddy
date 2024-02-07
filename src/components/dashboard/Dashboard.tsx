@@ -2,7 +2,7 @@ import { ActionIcon, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 
-import { DEFAULT_GRADIENT } from 'components/constants';
+import { DEFAULT_GRADIENT, DEFAULT_OVERLAY } from 'components/constants';
 import { NewRound, NewRoundTitle } from 'components/round/NewRound';
 import { useDevice } from 'components/util';
 
@@ -18,7 +18,7 @@ export function Dashboard() {
         title={<NewRoundTitle />}
         size="xl"
         fullScreen={isMobile}
-        overlayProps={{ backgroundOpacity: 0.55, blur: 3 }}
+        overlayProps={DEFAULT_OVERLAY}
       >
         <NewRound closeModal={close} />
       </Modal>

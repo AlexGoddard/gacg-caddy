@@ -14,3 +14,4 @@ export enum Division {
 }
 
 export const DEFAULT_GRADIENT = { from: 'indigo', to: 'teal', deg: 150 };
+export const DEFAULT_OVERLAY = { backgroundOpacity: 0.55, blur: 3 };

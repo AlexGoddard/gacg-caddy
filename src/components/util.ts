@@ -2,6 +2,8 @@ import { useMediaQuery } from '@mantine/hooks';
 
 import { TournamentDay } from 'components/constants';
 
+export const capitalize = (value: string) => `${value[0].toUpperCase()}${value.slice(1)}`;
+
 export function getTournamentDay() {
   const currentDate = new Date();
   switch (currentDate.getDay()) {
