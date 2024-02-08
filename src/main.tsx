@@ -1,17 +1,19 @@
 import React from 'react';
 
 import { MantineProvider } from '@mantine/core';
-import '@mantine/core/styles.css';
 import { Notifications } from '@mantine/notifications';
-import '@mantine/notifications/styles.css';
-import 'mantine-datatable/styles.css';
 import ReactDOM from 'react-dom/client';
 
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import 'mantine-datatable/styles.css';
+
 import App from './App.tsx';
+import { theme } from './theme.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <MantineProvider defaultColorScheme="dark">
+    <MantineProvider defaultColorScheme="dark" theme={theme}>
       <Notifications limit={3} />
       <App />
     </MantineProvider>

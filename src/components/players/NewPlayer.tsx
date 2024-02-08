@@ -14,7 +14,7 @@ import { IconArrowRight, IconUser } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import * as notifications from 'components/notifications';
-import { DEFAULT_GRADIENT, Division } from 'components/constants';
+import { Division } from 'components/constants';
 import { capitalize } from 'components/util';
 
 import { NewPlayer, savePlayer } from 'hooks/players';
@@ -111,12 +111,7 @@ export function NewPlayerForm(props: NewPlayerProps) {
           <Button type="reset" variant="subtle">
             Clear
           </Button>
-          <Button
-            type="submit"
-            variant="gradient"
-            gradient={DEFAULT_GRADIENT}
-            rightSection={<IconArrowRight size={14} />}
-          >
+          <Button type="submit" variant="gradient" rightSection={<IconArrowRight size={14} />}>
             Submit
           </Button>
         </Group>
@@ -127,7 +122,7 @@ export function NewPlayerForm(props: NewPlayerProps) {
 
 export const NewPlayerTitle = () => {
   return (
-    <Text variant="gradient" gradient={DEFAULT_GRADIENT} fz="xl" fw="bold">
+    <Text variant="gradient" fz="xl" fw="bold">
       New Player
       <IconUser className="headerIcon" />
     </Text>

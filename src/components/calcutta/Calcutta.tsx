@@ -1,17 +1,23 @@
 import { useState } from 'react';
 
-import { ActionIcon, Group, Paper, Stack, StackProps } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
+import { Group, Paper, Stack, StackProps } from '@mantine/core';
 import { useQueries } from '@tanstack/react-query';
 import { DataTable } from 'mantine-datatable';
 
 import { CalcuttaScorecard, CalcuttaScorecardData } from 'components/calcutta/CalcuttaScorecard';
 import { Place, Podium } from 'components/common/Podium';
+import { DownloadButton } from 'components/common/controls';
 import { NoRecordsFeedback } from 'components/common/feedback';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
-import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
-import { getTournamentDay, getTournamentYear, sum } from 'components/util';
+import { ScoreType, TournamentDay } from 'components/constants';
+import {
+  DownloadData,
+  downloadFile,
+  getTournamentDay,
+  getTournamentYear,
+  sum,
+} from 'components/util';
 
 import { CalcuttaTeam, useCalcuttaQuery, useCalcuttaSampleQuery } from 'hooks/rounds';
 
@@ -48,60 +54,55 @@ export function Calcutta() {
   const [tournamentDay, setTournamentDay] = useState(getTournamentDay());
   const [prizePool, setPrizePool] = useState<string | number>(5000);
 
-  const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
-  const grossPayouts = [0.1, 0.05].map((percent) => percent * Number(prizePool));
-
   const isSample = tournamentDay !== TournamentDay.SUNDAY;
   const [calcuttaQuery, calcuttaSampleQuery] = useQueries({
     queries: [useCalcuttaQuery(tournamentDay), useCalcuttaSampleQuery(isSample)],
   });
   const calcutta = calcuttaQuery.isSuccess ? calcuttaQuery.data : [];
 
+  const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
+  const grossPayouts = [0.1, 0.05].map((percent) => percent * Number(prizePool));
+
   const calcuttaTableData = getCalcuttaTableData(calcutta);
 
   const downloadCalcutta = () => {
-    const calcuttaFileData = [];
+    const fileName = `calcutta-${isSample ? 'sample-' : ''}${getTournamentYear()}.csv`;
     if (isSample) {
-      const HEADERS = [
-        'A Player',
-        'Handicap',
-        'Friday Gross',
-        'Friday Net',
-        'Saturday Gross',
-        'Saturday Net',
-        'B Player',
-        'Handicap',
-        'Friday Gross',
-        'Friday Net',
-        'Saturday Gross',
-        'Saturday Net',
-        'Team Friday Gross',
-        'Team Friday Net',
-        'Team Saturday Gross',
-        'Team Saturday Net',
-      ];
-      calcuttaFileData.push(HEADERS);
       const calcuttaSample = calcuttaSampleQuery.isSuccess ? calcuttaSampleQuery.data : [];
-      calcuttaSample.map((calcuttaTeam) => calcuttaFileData.push(calcuttaTeam));
+      const downloadData: DownloadData = {
+        headers: [
+          'A Player',
+          'Handicap',
+          'Friday Gross',
+          'Friday Net',
+          'Saturday Gross',
+          'Saturday Net',
+          'B Player',
+          'Handicap',
+          'Friday Gross',
+          'Friday Net',
+          'Saturday Gross',
+          'Saturday Net',
+          'Team Friday Gross',
+          'Team Friday Net',
+          'Team Saturday Gross',
+          'Team Saturday Net',
+        ],
+        rows: calcuttaSample,
+      };
+      downloadFile(fileName, downloadData);
     } else {
-      const HEADERS = ['A Player', 'B Player', 'Gross', 'Net'];
-      calcuttaFileData.push(HEADERS);
-      calcutta.map((calcuttaTeam) => {
-        calcuttaFileData.push([
+      const downloadData: DownloadData = {
+        headers: ['A Player', 'B Player', 'Gross', 'Net'],
+        rows: calcutta.map((calcuttaTeam) => [
           calcuttaTeam.a.name,
           calcuttaTeam.b.name,
-          calcuttaTeam.gross,
-          calcuttaTeam.net,
-        ]);
-      });
+          calcuttaTeam.gross.toString(),
+          calcuttaTeam.net.toString(),
+        ]),
+      };
+      downloadFile(fileName, downloadData);
     }
-    const calcuttaFile = new Blob([calcuttaFileData.map((row) => row.join(',')).join('\n')], {
-      type: 'text/csv',
-    });
-    const element = document.createElement('a');
-    element.href = URL.createObjectURL(calcuttaFile);
-    element.download = `calcutta-${isSample ? 'sample-' : ''}${getTournamentYear()}.csv`;
-    element.click();
   };
 
   const getWinnings = (payouts: number[], teamsAlreadyPlaced: number, numTeams: number) => {
@@ -329,15 +330,11 @@ export function Calcutta() {
         />
         <Group>
           <PrizePoolInput labelId="calcuttaPrizePool" value={prizePool} onChange={setPrizePool} />
-          <ActionIcon
+          <DownloadButton
             disabled={isSample ? !calcuttaSampleQuery.isSuccess : !calcuttaQuery.isSuccess}
-            variant="gradient"
             aria-label="Download calcutta"
-            gradient={DEFAULT_GRADIENT}
             onClick={downloadCalcutta}
-          >
-            <IconDownload />
-          </ActionIcon>
+          />
         </Group>
       </Group>
       <Stack gap="xl">

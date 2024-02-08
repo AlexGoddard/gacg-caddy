@@ -1,17 +1,21 @@
 import { useState } from 'react';
 
-import { ActionIcon, Group, Paper, Stack, StackProps } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
-import JSZip from 'jszip';
+import { Group, Paper, Stack, StackProps } from '@mantine/core';
 import { DataTable } from 'mantine-datatable';
 
 import { Place, Podium } from 'components/common/Podium';
+import { DownloadButton } from 'components/common/controls';
 import { NoRecordsFeedback } from 'components/common/feedback';
 import { DaySelector } from 'components/common/form-inputs';
 import { SectionTitle } from 'components/common/typography';
-import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
+import { ScoreType, TournamentDay } from 'components/constants';
 import { RoundsScorecard, RoundsScorecardData } from 'components/round/RoundsScorecard';
-import { getTournamentDay, getTournamentYear } from 'components/util';
+import {
+  NamedDownloadData,
+  downloadZip,
+  getTournamentDay,
+  getTournamentYear,
+} from 'components/util';
 
 import { PlayerRound, useRounds } from 'hooks/rounds';
 
@@ -45,25 +49,13 @@ export function Rounds() {
   const roundsTableData = getRoundsTableData(rounds);
 
   const downloadRounds = () => {
-    const zip = new JSZip();
-    Object.values(ScoreType).map((scoreType) => {
-      const roundsFileData = [HEADERS];
-      roundsTableData[scoreType].map((round) =>
-        roundsFileData.push([round.player, round.score.toString()]),
-      );
-      zip.file(
-        `${scoreType}.csv`,
-        new Blob([roundsFileData.map((row) => row.join(',')).join('\n')], {
-          type: 'text/csv',
-        }),
-      );
-    });
-    zip.generateAsync({ type: 'blob' }).then((zippedFile) => {
-      const element = document.createElement('a');
-      element.href = URL.createObjectURL(zippedFile);
-      element.download = `rounds-${tournamentDay}-${getTournamentYear()}.zip`;
-      element.click();
-    });
+    const fileName = `rounds-${tournamentDay}-${getTournamentYear()}.zip`;
+    const toDownload: NamedDownloadData[] = Object.values(ScoreType).map((scoreType) => ({
+      fileName: `${scoreType}.csv`,
+      headers: HEADERS,
+      rows: roundsTableData[scoreType].map((round) => [round.player, round.score.toString()]),
+    }));
+    downloadZip(fileName, toDownload);
   };
 
   function getRoundsTableData(rounds: PlayerRound[]) {
@@ -167,17 +159,11 @@ export function Rounds() {
           value={tournamentDay}
           onChange={(day) => setTournamentDay(day as TournamentDay)}
         />
-        <Group>
-          <ActionIcon
-            disabled={!isSuccess}
-            variant="gradient"
-            aria-label="Download calcutta"
-            gradient={DEFAULT_GRADIENT}
-            onClick={downloadRounds}
-          >
-            <IconDownload />
-          </ActionIcon>
-        </Group>
+        <DownloadButton
+          disabled={!isSuccess}
+          aria-label="Download calcutta"
+          onClick={downloadRounds}
+        />
       </Group>
       <Stack gap="xl">
         {tournamentDay === TournamentDay.ALL && (

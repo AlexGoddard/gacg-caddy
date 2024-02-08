@@ -1,8 +1,8 @@
-import { ActionIcon, Modal } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus } from '@tabler/icons-react';
 
-import { DEFAULT_GRADIENT, DEFAULT_OVERLAY } from 'components/constants';
+import { AddButton } from 'components/common/controls';
+import { DEFAULT_OVERLAY } from 'components/constants';
 import { NewRound, NewRoundTitle } from 'components/round/NewRound';
 import { useDevice } from 'components/util';
 
@@ -23,15 +23,7 @@ export function Dashboard() {
         <NewRound closeModal={close} />
       </Modal>
 
-      <ActionIcon
-        variant="gradient"
-        size="xl"
-        aria-label="Add new round"
-        gradient={DEFAULT_GRADIENT}
-        onClick={open}
-      >
-        <IconPlus />
-      </ActionIcon>
+      <AddButton size="xl" aria-label="Add new round" onClick={open} />
     </>
   );
 }

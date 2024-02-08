@@ -110,7 +110,7 @@ function fetchCalcutta(day: TournamentDay): Promise<CalcuttaTeam[]> {
   return get('/calcutta', { day: day }).then((calcutta) => calcutta);
 }
 
-function fetchCalcuttaSample(): Promise<(string | number)[][]> {
+function fetchCalcuttaSample(): Promise<string[][]> {
   return get('/calcutta/sample').then((calcuttaSample) => calcuttaSample);
 }
 

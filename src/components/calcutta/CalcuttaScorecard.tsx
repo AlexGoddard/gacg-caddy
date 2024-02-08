@@ -1,11 +1,9 @@
 import { TableProps } from '@mantine/core';
 
 import { Scorecard } from 'components/common/Scorecard';
-import { ScoreType, TournamentDay } from 'components/constants';
+import { PLACEHOLDER_SCORES, ScoreType, TournamentDay } from 'components/constants';
 
 import { PlayerInfo, useCalcuttaTeamHoles } from 'hooks/rounds';
-
-const PLACEHOLDER_SCORES = new Array(18).fill('');
 
 export interface CalcuttaScorecardData {
   day: TournamentDay;

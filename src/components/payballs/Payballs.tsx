@@ -1,12 +1,16 @@
 import { useState } from 'react';
 
-import { ActionIcon, Group, Stack, Table, Title } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
-import JSZip from 'jszip';
+import { Group, Stack, Table, Title } from '@mantine/core';
 
+import { DownloadButton } from 'components/common/controls';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
-import { DEFAULT_GRADIENT, ScoreType, TournamentDay } from 'components/constants';
-import { getTournamentDay, getTournamentYear } from 'components/util';
+import { ScoreType, TournamentDay } from 'components/constants';
+import {
+  NamedDownloadData,
+  downloadZip,
+  getTournamentDay,
+  getTournamentYear,
+} from 'components/util';
 
 import { usePayballs } from 'hooks/rounds';
 
@@ -40,6 +44,9 @@ export function Payballs() {
     scoreType: payballData.scoreType,
     element: (
       <Table
+        ta="left"
+        fz="xl"
+        w="fit-content"
         className="payballsTable"
         data={payballData.elementData}
         key={`${payballData.scoreType}-payball-table`}
@@ -48,23 +55,13 @@ export function Payballs() {
   }));
 
   const downloadPayballs = () => {
-    const zip = new JSZip();
-    payballTableData.map((payballData) => {
-      const payballsFileData = [HEADERS];
-      payballData.elementData.body.map((payball) => payballsFileData.push(payball));
-      zip.file(
-        `${payballData.scoreType}.csv`,
-        new Blob([payballsFileData.map((row) => row.join(',')).join('\n')], {
-          type: 'text/csv',
-        }),
-      );
-    });
-    zip.generateAsync({ type: 'blob' }).then((zippedFile) => {
-      const element = document.createElement('a');
-      element.href = URL.createObjectURL(zippedFile);
-      element.download = `payballs-${tournamentDay}-${getTournamentYear()}.zip`;
-      element.click();
-    });
+    const fileName = `payballs-${tournamentDay}-${getTournamentYear()}.zip`;
+    const toDownload: NamedDownloadData[] = payballTableData.map((payballData) => ({
+      fileName: `${payballData.scoreType}.csv`,
+      headers: HEADERS,
+      rows: payballData.elementData.body,
+    }));
+    downloadZip(fileName, toDownload);
   };
 
   const numGrossPayballs = payballTableData
@@ -91,14 +88,7 @@ export function Payballs() {
         />
         <Group>
           <PrizePoolInput labelId="payballsPrizePool" value={prizePool} onChange={setPrizePool} />
-          <ActionIcon
-            variant="gradient"
-            aria-label="Download payballs"
-            gradient={DEFAULT_GRADIENT}
-            onClick={downloadPayballs}
-          >
-            <IconDownload />
-          </ActionIcon>
+          <DownloadButton aria-label="Download payballs" onClick={downloadPayballs} />
         </Group>
       </Group>
       <Group align="flex-start" justify="space-around">

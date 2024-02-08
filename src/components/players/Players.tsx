@@ -1,13 +1,14 @@
 import { useState } from 'react';
 
-import { ActionIcon, Button, Checkbox, Group, List, Modal, Stack, Table } from '@mantine/core';
+import { Button, Checkbox, Group, List, Modal, Stack, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconTrash } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import * as notifications from 'components/notifications';
+import { AddButton, DeleteButton } from 'components/common/controls';
 import { SectionTitle } from 'components/common/typography';
-import { DEFAULT_GRADIENT, DEFAULT_OVERLAY } from 'components/constants';
+import { DEFAULT_OVERLAY } from 'components/constants';
 import { NewPlayerForm, NewPlayerTitle } from 'components/players/NewPlayer';
 import { useDevice } from 'components/util';
 
@@ -114,28 +115,16 @@ export function Players() {
         <Group justify="space-between" align="flex-end">
           <SectionTitle>Players</SectionTitle>
           <Group>
-            <ActionIcon
-              variant="light"
-              color="red"
+            <DeleteButton
               size="xl"
               aria-label="Delete selected players"
               onClick={deleteConfirmOpen}
               disabled={selectedPlayers.length === 0}
-            >
-              <IconTrash />
-            </ActionIcon>
-            <ActionIcon
-              variant="gradient"
-              size="xl"
-              aria-label="Add new player"
-              gradient={DEFAULT_GRADIENT}
-              onClick={newPlayerFormOpen}
-            >
-              <IconPlus />
-            </ActionIcon>
+            />
+            <AddButton size="xl" aria-label="Add new player" onClick={newPlayerFormOpen} />
           </Group>
         </Group>
-        <Table className="playersTable">
+        <Table ta="left" fz="xl">
           <Table.Thead>
             <Table.Tr>
               <Table.Th></Table.Th>

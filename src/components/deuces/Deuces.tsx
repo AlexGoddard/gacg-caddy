@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import { ActionIcon, Group, Stack, Table, Title } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
+import { Group, Stack, Table, Title } from '@mantine/core';
 
+import { DownloadButton } from 'components/common/controls';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
-import { DEFAULT_GRADIENT, TournamentDay } from 'components/constants';
-import { getTournamentDay, getTournamentYear } from 'components/util';
+import { TournamentDay } from 'components/constants';
+import { DownloadData, downloadFile, getTournamentDay, getTournamentYear } from 'components/util';
 
 import { useDeuces } from 'hooks/rounds';
 
@@ -28,15 +28,12 @@ export function Deuces() {
   );
 
   const downloadDeuces = () => {
-    const deucesFileData = [HEADERS];
-    deuceTableData.map((deuce) => deucesFileData.push(deuce));
-    const deucesFile = new Blob([deucesFileData.map((row) => row.join(',')).join('\n')], {
-      type: 'text/csv',
-    });
-    const element = document.createElement('a');
-    element.href = URL.createObjectURL(deucesFile);
-    element.download = `deuces-${tournamentDay}-${getTournamentYear()}.csv`;
-    element.click();
+    const fileName = `deuces-${tournamentDay}-${getTournamentYear()}.csv`;
+    const downloadData: DownloadData = {
+      headers: HEADERS,
+      rows: deuceTableData,
+    };
+    downloadFile(fileName, downloadData);
   };
 
   return (
@@ -49,17 +46,10 @@ export function Deuces() {
         />
         <Group>
           <PrizePoolInput labelId="deucesPrizePool" value={prizePool} onChange={setPrizePool} />
-          <ActionIcon
-            variant="gradient"
-            aria-label="Download deuces"
-            gradient={DEFAULT_GRADIENT}
-            onClick={downloadDeuces}
-          >
-            <IconDownload />
-          </ActionIcon>
+          <DownloadButton aria-label="Download deuces" onClick={downloadDeuces} />
         </Group>
       </Group>
-      <Stack gap={0}>
+      <Stack gap={0} title="test">
         <Title>Deuces</Title>
         <Title c="indigo" order={3}>
           ($
@@ -71,7 +61,8 @@ export function Deuces() {
           head: HEADERS,
           body: deuceTableData,
         }}
-        className="deuceTable"
+        ta="left"
+        fz="xl"
       />
     </Stack>
   );

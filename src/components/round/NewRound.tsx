@@ -17,7 +17,7 @@ import { useMutation, useQueries } from '@tanstack/react-query';
 import * as notifications from 'components/notifications';
 import { SplitData } from 'components/common/data-display';
 import { DaySelector, HoleInput, PlayerInput } from 'components/common/form-inputs';
-import { DEFAULT_GRADIENT, TournamentDay } from 'components/constants';
+import { TournamentDay } from 'components/constants';
 import { getGross, getIn, getNet, getOut, getTournamentDay } from 'components/util';
 
 import { useHolesQuery } from 'hooks/holes';
@@ -115,12 +115,8 @@ export function NewRound(props: NewRoundProps) {
             <PlayerInput data-autofocus {...form.getInputProps('playerId')} />
             {selectedPlayer && (
               <>
-                <Badge variant="gradient" gradient={DEFAULT_GRADIENT}>
-                  Division: {selectedPlayer.division}
-                </Badge>
-                <Badge variant="gradient" gradient={DEFAULT_GRADIENT}>
-                  Handicap: {selectedPlayer.handicap}
-                </Badge>
+                <Badge variant="gradient">Division: {selectedPlayer.division}</Badge>
+                <Badge variant="gradient">Handicap: {selectedPlayer.handicap}</Badge>
               </>
             )}
           </Group>
@@ -170,12 +166,7 @@ export function NewRound(props: NewRoundProps) {
           <Button type="reset" variant="subtle">
             Clear
           </Button>
-          <Button
-            type="submit"
-            variant="gradient"
-            gradient={DEFAULT_GRADIENT}
-            rightSection={<IconArrowRight size={14} />}
-          >
+          <Button type="submit" variant="gradient" rightSection={<IconArrowRight size={14} />}>
             Submit
           </Button>
         </Group>
@@ -186,7 +177,7 @@ export function NewRound(props: NewRoundProps) {
 
 export const NewRoundTitle = () => {
   return (
-    <Text variant="gradient" gradient={DEFAULT_GRADIENT} fz="xl" fw="bold">
+    <Text variant="gradient" fz="xl" fw="bold">
       New Round
       <IconGolf className="headerIcon" />
     </Text>

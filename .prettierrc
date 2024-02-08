@@ -4,6 +4,7 @@
   "importOrder": [
     "^(react|react-dom|react-router-dom)$",
     "<THIRD_PARTY_MODULES>",
+    "^(?!\\.).*.css",
     "^components/(.*)$",
     "^hooks/(.*)$",
     "^util/(.*)$",
