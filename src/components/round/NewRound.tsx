@@ -16,7 +16,7 @@ import { useMutation, useQueries } from '@tanstack/react-query';
 
 import * as notifications from 'components/notifications';
 import { SplitData } from 'components/common/data-display';
-import { DaySelector, HoleInput, PlayerInput } from 'components/common/form-inputs';
+import { DaySelector, HoleInput, PlayerSelect } from 'components/common/form-inputs';
 import { TournamentDay } from 'components/constants';
 import { getGross, getIn, getNet, getOut, getTournamentDay } from 'components/util';
 
@@ -112,11 +112,11 @@ export function NewRound(props: NewRoundProps) {
         <DaySelector {...form.getInputProps('day')} />
         <Fieldset legend="Player Info">
           <Group>
-            <PlayerInput data-autofocus {...form.getInputProps('playerId')} />
+            <PlayerSelect data-autofocus {...form.getInputProps('playerId')} />
             {selectedPlayer && (
               <>
-                <Badge variant="gradient">Division: {selectedPlayer.division}</Badge>
-                <Badge variant="gradient">Handicap: {selectedPlayer.handicap}</Badge>
+                <Badge variant="filled">Division: {selectedPlayer.division}</Badge>
+                <Badge variant="filled">Handicap: {selectedPlayer.handicap}</Badge>
               </>
             )}
           </Group>
@@ -159,14 +159,14 @@ export function NewRound(props: NewRoundProps) {
                 </Grid>
               </Group>
             )}
-            {holesQuery.isError && <Text c="red">{holesQuery.error.message}</Text>}
+            {holesQuery.isError && <Text c="blush">{holesQuery.error.message}</Text>}
           </Fieldset>
         </Skeleton>
         <Group justify="flex-end">
           <Button type="reset" variant="subtle">
             Clear
           </Button>
-          <Button type="submit" variant="gradient" rightSection={<IconArrowRight size={14} />}>
+          <Button type="submit" rightSection={<IconArrowRight size={14} />}>
             Submit
           </Button>
         </Group>
@@ -177,7 +177,7 @@ export function NewRound(props: NewRoundProps) {
 
 export const NewRoundTitle = () => {
   return (
-    <Text variant="gradient" fz="xl" fw="bold">
+    <Text fz="xl" fw="bold">
       New Round
       <IconGolf className="headerIcon" />
     </Text>

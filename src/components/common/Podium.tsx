@@ -1,6 +1,8 @@
 import { Group, GroupProps, Paper, Stack, StackProps, Text, Title } from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
 
+import { Winnings } from 'components/common/data-display';
+
 import './style.less';
 
 export interface Place {
@@ -24,11 +26,25 @@ export const Podium = (props: PodiumProps) => {
     const trophyClass = 'trophy';
     switch (place) {
       case 1:
-        return <IconTrophy size={iconSize} color="#FFD700" className={trophyClass} />;
+        return (
+          <IconTrophy
+            size={iconSize}
+            color="var(--mantine-color-beach-4)"
+            className={trophyClass}
+          />
+        );
       case 2:
-        return <IconTrophy size={iconSize} color="#C0C0C0" className={trophyClass} />;
+        return (
+          <IconTrophy size={iconSize} color="var(--mantine-color-snow-2)" className={trophyClass} />
+        );
       case 3:
-        return <IconTrophy size={iconSize} color="#CD7F32" className={trophyClass} />;
+        return (
+          <IconTrophy
+            size={iconSize}
+            color="var(--mantine-color-sunset-4)"
+            className={trophyClass}
+          />
+        );
       default:
         return (
           <Title order={2} className={trophyClass}>
@@ -48,8 +64,8 @@ export const Podium = (props: PodiumProps) => {
           <Text fw="bold" fz="lg">
             {score}{' '}
             {winnings && (
-              <Text span inherit c="indigo">
-                (${winnings})
+              <Text span inherit c="sage">
+                <Winnings value={winnings} />
               </Text>
             )}
           </Text>

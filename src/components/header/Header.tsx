@@ -20,9 +20,7 @@ export function Header(props: HeaderProps) {
         </UnstyledButton>
       </Flex>
       <UnstyledButton to="/" onClick={() => setActiveRoute(0)} component={Link}>
-        <Title order={4} className="headerTitle">
-          GACG Caddy
-        </Title>
+        <Title order={4}>GACG Caddy</Title>
       </UnstyledButton>
     </Group>
   );

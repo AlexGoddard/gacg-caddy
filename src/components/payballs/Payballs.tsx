@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Group, Stack, Table, Title } from '@mantine/core';
 
 import { DownloadButton } from 'components/common/controls';
+import { Winnings } from 'components/common/data-display';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { ScoreType, TournamentDay } from 'components/constants';
 import {
@@ -94,9 +95,8 @@ export function Payballs() {
       <Group align="flex-start" justify="space-around">
         <Stack gap={0}>
           <Title>Gross Payballs</Title>
-          <Title c="indigo" order={3}>
-            ($
-            {grossPayballValue})
+          <Title c="sage" order={3}>
+            <Winnings value={grossPayballValue} />
           </Title>
           {payballTables
             .filter((table) => table.scoreType === ScoreType.GROSS)
@@ -104,9 +104,8 @@ export function Payballs() {
         </Stack>
         <Stack gap={0}>
           <Title>Net Payballs</Title>
-          <Title c="indigo" order={3}>
-            ($
-            {netPayballValue})
+          <Title c="sage" order={3}>
+            <Winnings value={netPayballValue} />
           </Title>
           {payballTables
             .filter((table) => table.scoreType === ScoreType.NET)

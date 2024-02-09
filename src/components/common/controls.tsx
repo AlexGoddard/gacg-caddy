@@ -6,19 +6,19 @@ interface CustomButtonProps
     ElementProps<'button', keyof ActionIconProps> {}
 
 export const AddButton = (props: CustomButtonProps) => (
-  <ActionIcon variant="gradient" {...props}>
+  <ActionIcon {...props}>
     <IconPlus />
   </ActionIcon>
 );
 
 export const DownloadButton = (props: CustomButtonProps) => (
-  <ActionIcon size="lg" variant="gradient" {...props}>
+  <ActionIcon size="lg" {...props}>
     <IconDownload />
   </ActionIcon>
 );
 
 export const DeleteButton = (props: CustomButtonProps) => (
-  <ActionIcon variant="light" color="red" {...props}>
+  <ActionIcon variant="light" color="blush" {...props}>
     <IconTrash />
   </ActionIcon>
 );

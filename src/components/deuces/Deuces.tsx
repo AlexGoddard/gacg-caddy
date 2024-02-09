@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Group, Stack, Table, Title } from '@mantine/core';
 
 import { DownloadButton } from 'components/common/controls';
+import { Winnings } from 'components/common/data-display';
 import { DaySelector, PrizePoolInput } from 'components/common/form-inputs';
 import { TournamentDay } from 'components/constants';
 import { DownloadData, downloadFile, getTournamentDay, getTournamentYear } from 'components/util';
@@ -51,9 +52,8 @@ export function Deuces() {
       </Group>
       <Stack gap={0} title="test">
         <Title>Deuces</Title>
-        <Title c="indigo" order={3}>
-          ($
-          {deuceValue})
+        <Title c="sage" order={3}>
+          <Winnings value={deuceValue} />
         </Title>
       </Stack>
       <Table

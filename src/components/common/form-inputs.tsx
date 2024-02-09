@@ -26,12 +26,12 @@ interface DaySelectorProps extends ChipGroupProps {
   days?: TournamentDay[];
 }
 
-interface PrizePoolInputProps extends NumberInputProps {
-  labelId: string;
-}
-
 interface HoleInputProps extends NumberInputProps {
   hole: Hole;
+}
+
+interface PrizePoolInputProps extends NumberInputProps {
+  labelId: string;
 }
 
 export const DaySelector = (props: DaySelectorProps) => {
@@ -43,7 +43,7 @@ export const DaySelector = (props: DaySelectorProps) => {
     <Chip.Group {...otherProps}>
       <Group justify="left">
         {availableDays.map((day) => (
-          <Chip variant="light" value={day} tt="capitalize" key={`${day}-selector`}>
+          <Chip variant="filled" value={day} tt="capitalize" key={`${day}-selector`}>
             {day}
           </Chip>
         ))}
@@ -98,7 +98,7 @@ export const HoleInput = (props: HoleInputProps) => {
   );
 };
 
-export const PlayerInput = (props: SelectProps) => {
+export const PlayerSelect = (props: SelectProps) => {
   const { isPending, isSuccess, isError, error, data } = usePlayers();
   const players = isSuccess ? data : [];
 

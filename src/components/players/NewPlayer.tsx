@@ -111,7 +111,7 @@ export function NewPlayerForm(props: NewPlayerProps) {
           <Button type="reset" variant="subtle">
             Clear
           </Button>
-          <Button type="submit" variant="gradient" rightSection={<IconArrowRight size={14} />}>
+          <Button type="submit" rightSection={<IconArrowRight size={14} />}>
             Submit
           </Button>
         </Group>
@@ -122,7 +122,7 @@ export function NewPlayerForm(props: NewPlayerProps) {
 
 export const NewPlayerTitle = () => {
   return (
-    <Text variant="gradient" fz="xl" fw="bold">
+    <Text fz="xl" fw="bold">
       New Player
       <IconUser className="headerIcon" />
     </Text>

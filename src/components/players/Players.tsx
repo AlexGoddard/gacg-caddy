@@ -38,11 +38,11 @@ export function Players() {
     .map((player) => {
       const isSelected = selectedPlayers.includes(player.id);
       return (
-        <Table.Tr bg={isSelected ? 'var(--mantine-color-red-light)' : undefined} key={player.id}>
+        <Table.Tr bg={isSelected ? 'var(--mantine-color-blush-light)' : undefined} key={player.id}>
           <Table.Td>
             <Checkbox
               aria-label="Select player"
-              color="red"
+              color="blush"
               checked={isSelected}
               onChange={(event) =>
                 setSelectedPlayers(
@@ -102,10 +102,10 @@ export function Players() {
             })}
           </List>
           <Group justify="flex-end">
-            <Button variant="light" color="gray" onClick={deleteConfirmClose}>
+            <Button variant="subtle" onClick={deleteConfirmClose}>
               Cancel
             </Button>
-            <Button bg="red" leftSection={<IconTrash size={14} />} onClick={delPlayers}>
+            <Button color="blush" leftSection={<IconTrash size={14} />} onClick={delPlayers}>
               Delete Players
             </Button>
           </Group>

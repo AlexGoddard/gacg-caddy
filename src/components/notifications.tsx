@@ -25,7 +25,7 @@ const success = (notificationType: NotificationType, props: NotificationData) =>
   const defaults = {
     title: 'Success!',
     icon: <IconCheck style={{ width: rem(20), height: rem(20) }} />,
-    color: 'teal',
+    color: 'sage.5',
   };
   const mergedProps = { ...defaults, ...props };
   if (notificationType === NotificationType.SHOW) {
@@ -40,7 +40,7 @@ const failure = (notificationType: NotificationType, props: NotificationData) =>
     title: 'Oops!',
     icon: <IconX style={{ width: rem(20), height: rem(20) }} />,
     autoClose: 5000,
-    color: 'red',
+    color: 'blush.5',
   };
   const mergedProps = { ...defaults, ...props };
   if (notificationType === NotificationType.SHOW) {

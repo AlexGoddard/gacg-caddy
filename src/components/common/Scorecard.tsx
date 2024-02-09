@@ -59,12 +59,12 @@ export const Scorecard = (props: ScorecardProps) => {
       <Table.Td key={`hole-${hole.holeNumber}-number`}>{hole.holeNumber}</Table.Td>
     );
     holeHeaders.pars[index] = (
-      <Table.Td key={`hole-${hole.holeNumber}-par`} c="green">
+      <Table.Td key={`hole-${hole.holeNumber}-par`} c="sage">
         {hole.par}
       </Table.Td>
     );
     holeHeaders.handicaps[index] = (
-      <Table.Td key={`hole-${hole.holeNumber}-handicap`} c="red">
+      <Table.Td key={`hole-${hole.holeNumber}-handicap`} c="blush">
         {hole.handicap}
       </Table.Td>
     );
@@ -77,7 +77,7 @@ export const Scorecard = (props: ScorecardProps) => {
     const scoreElements = row.scores.map((holeScore, holeIndex) => (
       <Table.Td key={`${row.name}-hole-${holeIndex + 1}-score`}>
         {!row.isTeamScore && teamScores && teamScores.scores[holeIndex] === holeScore ? (
-          <Indicator size={4} color="green.7" zIndex={1}>
+          <Indicator size={4} color="sage" zIndex={1}>
             {holeScore}
           </Indicator>
         ) : (
@@ -104,9 +104,9 @@ export const Scorecard = (props: ScorecardProps) => {
         visible={isPending}
         zIndex={1000}
         overlayProps={{ color: '#000', backgroundOpacity: 0.3, blur: 4 }}
-        loaderProps={{ color: 'indigo', type: 'bars' }}
+        loaderProps={{ type: 'bars' }}
       />
-      <Table p="md" bg="dark.9" className="scorecard" {...otherProps}>
+      <Table className="scorecard" withColumnBorders {...otherProps}>
         <Table.Tbody>
           {/* Headers */}
           <Table.Tr className="scorecardInfo">
@@ -123,14 +123,14 @@ export const Scorecard = (props: ScorecardProps) => {
 
           {/* Pars */}
           <Table.Tr className="scorecardInfo">
-            <Table.Td c="green" className="leftLabel">
+            <Table.Td c="sage" className="leftLabel">
               PAR
             </Table.Td>
             {holeHeaders.pars.slice(0, 9)}
-            <Table.Td c="green">36</Table.Td>
+            <Table.Td c="sage">36</Table.Td>
             {holeHeaders.pars.slice(-9)}
-            <Table.Td c="green">36</Table.Td>
-            <Table.Td c="green">72</Table.Td>
+            <Table.Td c="sage">36</Table.Td>
+            <Table.Td c="sage">72</Table.Td>
           </Table.Tr>
 
           {/* Last Two Score Rows */}
@@ -138,7 +138,7 @@ export const Scorecard = (props: ScorecardProps) => {
 
           {/* Handicaps */}
           <Table.Tr className="scorecardInfo">
-            <Table.Td c="red" className="leftLabel">
+            <Table.Td c="blush" className="leftLabel">
               HANDICAP
             </Table.Td>
             {holeHeaders.handicaps.slice(0, 9)}

@@ -114,11 +114,7 @@ export function Rounds() {
             minHeight={150}
             noRecordsText="No results yet"
             noRecordsIcon={<NoRecordsFeedback />}
-            styles={{
-              header: (theme) => ({
-                backgroundColor: theme.colors.dark[8],
-              }),
-            }}
+            borderColor="var(--gacg-color-border)"
             columns={[
               {
                 accessor: 'player',
@@ -130,7 +126,6 @@ export function Rounds() {
             records={records}
             fetching={isPending}
             loaderType="bars"
-            loaderColor="indigo"
             rowExpansion={{
               collapseProps: {
                 transitionDuration: 400,

@@ -42,7 +42,7 @@ export function Navbar(props: NavbarProps) {
         if (isMobile) toggle();
         setActiveRoute(index);
       }}
-      variant="light"
+      variant="subtle"
       component={Link}
     />
   ));

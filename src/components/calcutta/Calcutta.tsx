@@ -278,11 +278,7 @@ export function Calcutta() {
             minHeight={150}
             noRecordsText="No results yet"
             noRecordsIcon={<NoRecordsFeedback />}
-            styles={{
-              header: (theme) => ({
-                backgroundColor: theme.colors.dark[8],
-              }),
-            }}
+            borderColor="var(--gacg-color-border)"
             columns={[
               {
                 accessor: 'aPlayer',
@@ -297,7 +293,6 @@ export function Calcutta() {
             records={records}
             fetching={calcuttaQuery.isPending}
             loaderType="bars"
-            loaderColor="indigo"
             rowExpansion={{
               collapseProps: {
                 transitionDuration: 400,

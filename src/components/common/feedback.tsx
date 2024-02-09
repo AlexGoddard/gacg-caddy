@@ -9,7 +9,7 @@ export const ErrorFeedback = (props: FeedbackProps) => {
   return (
     <Tooltip
       position="right"
-      color="dark.6"
+      color="slate.6"
       withArrow
       transitionProps={{ transition: 'scale-x', duration: 300 }}
       {...props}

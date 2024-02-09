@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { Paper, Stack, StackProps } from '@mantine/core';
+import { NumberFormatter, NumberFormatterProps, Paper, Stack, StackProps } from '@mantine/core';
 
 import './style.less';
 
@@ -8,6 +8,10 @@ interface SplitDataProps extends StackProps {
   topSection: ReactNode;
   bottomSection: ReactNode;
 }
+
+export const Winnings = (props: NumberFormatterProps) => (
+  <NumberFormatter prefix="$" thousandSeparator {...props} />
+);
 
 export const SplitData = (props: SplitDataProps) => {
   const { topSection, bottomSection, ...otherProps } = props;

@@ -3,3 +3,81 @@
   margin: 0 auto;
   text-align: center;
 }
+
+body {
+  /* App Variables */
+  --gacg-color-body: var(--mantine-color-slate-9);
+  --gacg-color-text: var(--mantine-color-snow-2);
+  --gacg-color-white: var(--mantine-color-snow-0);
+  --gacg-color-error: var(--mantine-color-blush-5);
+  --gacg-color-selected: var(--mantine-color-cyprus-3);
+  --gacg-color-border: var(--mantine-color-slate-6);
+  --gacg-color-dimmed: var(--mantine-color-slate-1);
+  --gacg-color-slate-highlight: var(--mantine-color-slate-8);
+  --gacg-color-cyprus-highlight: var(--mantine-color-cyprus-2);
+
+  /* Temporary Mantine Overrides (until I figure out a better way) */
+  --mantine-color-body: var(--gacg-color-body);
+  --mantine-color-text: var(--gacg-color-text);
+  --mantine-color-white: var(--gacg-color-white);
+  --mantine-color-black: var(--gacg-color-body);
+  --mantine-color-dimmed: var(--gacg-color-dimmed);
+  --mantine-color-error: var(--gacg-color-error);
+}
+
+/* Component Theme Overrides */
+.gacgActionIcon:disabled {
+  background-color: var(--mantine-color-cyprus-light);
+  color: var(--gacg-color-dimmed);
+}
+
+.gacgChipLabel:not([data-checked]) {
+  background-color: var(--mantine-color-slate-7) !important;
+}
+
+.gacgChipLabel:hover:not([data-checked]) {
+  background-color: var(--mantine-color-slate-6) !important;
+}
+
+.gacgInput::placeholder {
+  color: var(--gacg-color-dimmed);
+  opacity: 1;
+}
+
+.gacgInput[data-error] {
+  border-color: var(--gacg-color-error) !important;
+}
+
+.gacgInput:focus:not([data-error]) {
+  border-color: var(--mantine-color-cyprus-2) !important;
+}
+
+.gacgInputSection > svg {
+  color: var(--gacg-color-dimmed);
+}
+
+.gacgModalCloseButton:hover {
+  background-color: var(--gacg-color-slate-highlight);
+}
+
+.gacgNavLink[data-active] {
+  color: var(--gacg-color-selected);
+}
+
+.gacgNavLink:hover {
+  background-color: var(--gacg-color-slate-highlight);
+}
+
+.gacgSelectGroupLabel {
+  color: var(--gacg-color-dimmed);
+}
+
+.gacgSelectGroupLabel::after {
+  background-color: var(--gacg-color-border);
+}
+
+.gacgSelectOption:hover,
+.gacgSelectOption[data-combobox-selected] {
+  color: var(--gacg-color-body);
+  background-color: var(--gacg-color-selected);
+}
