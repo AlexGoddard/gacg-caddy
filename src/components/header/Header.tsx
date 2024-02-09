@@ -1,27 +1,31 @@
-import { Link } from 'react-router-dom';
-
-import { Flex, Group, GroupProps, Title, UnstyledButton } from '@mantine/core';
+import { Flex, Group, GroupProps, UnstyledButton, rem } from '@mantine/core';
+import { useWindowScroll } from '@mantine/hooks';
 import { IconMenu2 } from '@tabler/icons-react';
 
 import './style.less';
 
 interface HeaderProps extends GroupProps {
   toggle: () => void;
-  setActiveRoute: (routeIndex: number) => void;
 }
 
 export function Header(props: HeaderProps) {
-  const { toggle, setActiveRoute, ...otherProps } = props;
+  const { toggle, ...otherProps } = props;
+  const [scroll] = useWindowScroll();
+
   return (
-    <Group justify="flex-start" align="center" gap="xs" className="headerContainer" {...otherProps}>
-      <Flex>
-        <UnstyledButton onClick={toggle} className="navControl" p="xs">
-          <IconMenu2 />
-        </UnstyledButton>
-      </Flex>
-      <UnstyledButton to="/" onClick={() => setActiveRoute(0)} component={Link}>
-        <Title order={4}>GACG Caddy</Title>
-      </UnstyledButton>
+    <Group
+      justify="space-between"
+      align="center"
+      className={`headerContainer${scroll.y > 0 ? ' headerShadow' : ''}`}
+      {...otherProps}
+    >
+      <Group gap="xs">
+        <Flex>
+          <UnstyledButton c="slate.1" onClick={toggle} className="navControl" h="35px">
+            <IconMenu2 style={{ width: rem(50), height: rem(20) }} />
+          </UnstyledButton>
+        </Flex>
+      </Group>
     </Group>
   );
 }

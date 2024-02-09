@@ -92,13 +92,13 @@ export const useCalcuttaTeamHoles = (
 ) => useQuery(useCalcuttaTeamHolesQuery(day, scoreType, aPlayerId, bPlayerId));
 
 export const useDeuces = (day: TournamentDay) =>
-  useQuery({ queryKey: ['deuces', day], queryFn: () => fetchDeuces(day) });
+  useQuery({ queryKey: ['games/deuces', day], queryFn: () => fetchDeuces(day) });
 
 export const usePayballs = (day: TournamentDay) =>
-  useQuery({ queryKey: ['payballs', day], queryFn: () => fetchPayballs(day) });
+  useQuery({ queryKey: ['games/payballs', day], queryFn: () => fetchPayballs(day) });
 
-export const useRounds = (day: TournamentDay) =>
-  useQuery({ queryKey: ['rounds', day], queryFn: () => fetchRounds(day) });
+export const useRounds = (day: TournamentDay, playerId?: number) =>
+  useQuery({ queryKey: ['rounds', day, playerId], queryFn: () => fetchRounds(day, playerId) });
 
 export const useScores = (day: TournamentDay, scoreType: ScoreType, playerId: number) =>
   useQuery({
@@ -129,15 +129,15 @@ function fetchCalcuttaTeamHoles(
 }
 
 function fetchDeuces(day: TournamentDay): Promise<Deuce[]> {
-  return get('/deuces', { day: day }).then((deuces) => deuces);
+  return get('/games/deuces', { day: day }).then((deuces) => deuces);
 }
 
 function fetchPayballs(day: TournamentDay): Promise<Payballs[]> {
-  return get('/payballs', { day: day }).then((payballs) => payballs);
+  return get('/games/payballs', { day: day }).then((payballs) => payballs);
 }
 
-function fetchRounds(day: TournamentDay): Promise<PlayerRound[]> {
-  return get('/rounds', { day: day }).then((rounds) => rounds);
+function fetchRounds(day: TournamentDay, playerId?: number): Promise<PlayerRound[]> {
+  return get('/rounds', { day: day, playerId: playerId }).then((rounds) => rounds);
 }
 
 function fetchScores(

@@ -2,8 +2,11 @@ import { app } from 'electron';
 import fs from 'fs';
 import path from 'node:path';
 
+import { Division } from 'components/constants';
+
 import { ScoreType, TournamentDay } from '../constants';
-import { CalcuttaTeam, CalcuttaTeamHoles, NewPlayer, Payballs, Round } from '../interface';
+import { CalcuttaTeam, CalcuttaTeamHoles, FormPlayer, Payballs, Round } from '../interface';
+import { getWhereClause } from './util';
 
 const DB_PATH = path.join(app.getPath('userData'), 'gacg.sqlite');
 
@@ -11,6 +14,21 @@ const DB_PATH = path.join(app.getPath('userData'), 'gacg.sqlite');
 const Database = require('better-sqlite3');
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
+
+// Calcutta
+
+export const createCalcuttaTeam = (aPlayerId: number, bPlayerId: number) => {
+  try {
+    const createTeam = db.prepare(`
+    INSERT INTO calcuttaTeams (aPlayerId, bPlayerId)
+    VALUES (@aPlayerId, @bPlayerId);
+  `);
+    createTeam.run({ aPlayerId: aPlayerId, bPlayerId: bPlayerId });
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export const getCalcutta = (day: TournamentDay): CalcuttaTeam[] => {
   const calcuttaTeamsQuery = db.prepare(
@@ -141,6 +159,50 @@ export const getCalcuttaTeamHoles = (
   };
 };
 
+export const getCalcuttaPartner = (playerId: number) => {
+  const calcuttaPartnerQuery = db.prepare(`
+    WITH partner
+      AS (SELECT aPlayerId as playerId
+        FROM calcuttaTeams
+        WHERE bPlayerId=@playerId
+        UNION
+        SELECT bPlayerId as playerId
+        FROM calcuttaTeams
+        WHERE aPlayerId=@playerId)
+    SELECT players.*
+    FROM partner
+      JOIN players ON playerId=players.id;
+  `);
+  const partner = calcuttaPartnerQuery.get({ playerId: playerId });
+  return partner ? partner : null;
+};
+
+export const getAvailablePartners = (division: Division) => {
+  const availablePartners = db.prepare(`
+    SELECT players.*
+    FROM players
+    WHERE division=@division
+      AND id NOT IN (SELECT ${division}PlayerId FROM calcuttaTeams);
+  `);
+  return availablePartners.all({ division: division });
+};
+
+export const deleteCalcuttaTeam = (playerId: number) => {
+  try {
+    const deleteCalcuttaTeam = db.prepare(`
+      DELETE FROM calcuttaTeams
+      WHERE aPlayerId=@playerId OR bPlayerId=@playerId
+    `);
+    deleteCalcuttaTeam.run({ playerId: playerId });
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+// Games
+
 export const getDeuces = (day: TournamentDay) => {
   const stmt = db.prepare(
     `
@@ -152,11 +214,6 @@ export const getDeuces = (day: TournamentDay) => {
     `,
   );
   return stmt.all(day);
-};
-
-export const getHoles = () => {
-  const stmt = db.prepare('SELECT * FROM holes;');
-  return stmt.all();
 };
 
 export const getPayballs = (day: TournamentDay) => {
@@ -196,29 +253,16 @@ export const getPayballs = (day: TournamentDay) => {
   return payballs;
 };
 
-export const deletePlayers = (playerIds: number[]) => {
-  try {
-    const deletePlayer = db.prepare(`
-      DELETE FROM players
-      WHERE id=@playerId
-    `);
-    const deleteManyPlayers = db.transaction((playerIds: number[]) => {
-      for (const playerId of playerIds) deletePlayer.run({ playerId: playerId });
-    });
-    deleteManyPlayers(playerIds);
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-};
+// Holes
 
-export const getPlayers = () => {
-  const stmt = db.prepare('SELECT * FROM players;');
+export const getHoles = () => {
+  const stmt = db.prepare('SELECT * FROM holes;');
   return stmt.all();
 };
 
-export const savePlayer = (player: NewPlayer) => {
+// Players
+
+export const createPlayer = (player: FormPlayer) => {
   try {
     const insertPlayer = db.prepare(`
       INSERT INTO players (firstName, lastName, division, handicap)
@@ -235,29 +279,50 @@ export const savePlayer = (player: NewPlayer) => {
   }
 };
 
-export const getRounds = (day: TournamentDay) => {
-  const stmt = db.prepare(`
-    SELECT players.id, fullName, SUM(gross) as gross, SUM(net) as net
-    FROM scoresWithNet
-      JOIN players ON scoresWithNet.playerId = players.id
-    ${day !== TournamentDay.ALL ? 'WHERE day=@day' : ''}
-    GROUP BY scoresWithNet.playerId;
-  `);
-  return stmt
-    .all({ day: day })
-    .map((round: { id: number; fullName: string; gross: number; net: number }) => {
-      return {
-        player: {
-          id: round.id,
-          name: round.fullName,
-        },
-        gross: round.gross,
-        net: round.net,
-      };
-    });
+export const getPlayers = () => {
+  const stmt = db.prepare('SELECT * FROM players;');
+  return stmt.all();
 };
 
-export const saveRound = (round: Round) => {
+export const updatePlayer = (player: FormPlayer) => {
+  try {
+    const updatePlayer = db.prepare(`
+      UPDATE players
+      SET firstName=@firstName,
+          lastName=@lastName,
+          division=@division,
+          handicap=@handicap
+      WHERE id=@id;
+    `);
+    updatePlayer.run(player);
+    const updatedPlayer = db.prepare(`
+      SELECT * FROM players
+      WHERE id=@playerId;
+    `);
+    return updatedPlayer.get({ playerId: player.id });
+  } catch (err) {
+    console.log(err);
+    return;
+  }
+};
+
+export const deletePlayer = (playerId: number) => {
+  try {
+    const deletePlayer = db.prepare(`
+      DELETE FROM players
+      WHERE id=@playerId
+    `);
+    deletePlayer.run({ playerId: playerId });
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+};
+
+// Scores
+
+export const addRound = (round: Round) => {
   try {
     const scores = round.grossHoles.map((holeScore, index) => {
       return { playerId: round.playerId, day: round.day, holeNumber: index + 1, gross: holeScore };
@@ -275,6 +340,28 @@ export const saveRound = (round: Round) => {
   }
 };
 
+export const getRounds = (day: TournamentDay, playerId?: number) => {
+  const stmt = db.prepare(`
+    SELECT players.id, fullName, SUM(gross) as gross, SUM(net) as net
+    FROM scoresWithNet
+      JOIN players ON scoresWithNet.playerId = players.id
+    ${getWhereClause(day, playerId)}
+    GROUP BY scoresWithNet.playerId;
+  `);
+  return stmt
+    .all({ day: day, playerId: playerId })
+    .map((round: { id: number; fullName: string; gross: number; net: number }) => {
+      return {
+        player: {
+          id: round.id,
+          name: round.fullName,
+        },
+        gross: round.gross,
+        net: round.net,
+      };
+    });
+};
+
 export const getScores = (day: TournamentDay, scoreType: ScoreType, playerId: number) => {
   const scoresQuery = db.prepare(`
     SELECT ${scoreType} as score
@@ -286,19 +373,24 @@ export const getScores = (day: TournamentDay, scoreType: ScoreType, playerId: nu
     day === TournamentDay.ALL
       ? [TournamentDay.FRIDAY, TournamentDay.SATURDAY, TournamentDay.SUNDAY]
       : [day];
-  return daysToFetch.map((dayToFetch) => {
-    const scores = scoresQuery
+  const scores: { day: TournamentDay; scores: number[] }[] = [];
+  daysToFetch.map((dayToFetch) => {
+    const dayScores = scoresQuery
       .all({ day: dayToFetch, playerId: playerId })
       .map((hole: { score: number }) => hole.score);
-    if (scores.length !== 0) {
-      return {
-        day: dayToFetch,
-        scores: scores,
-      };
+    if (dayScores.length !== 0) {
+      scores.push({ day: dayToFetch, scores: dayScores });
     }
   });
+  return scores;
 };
 
+// Database Setup
+
+// To do:
+//   - Ensure unique constraint is created correctly
+//   - Handle cascading on player deletion
+//   - Create database if it doesn't exist
 export const populateDatabase = () => {
   // holes
   db.exec('CREATE TABLE holes (holeNumber INTEGER PRIMARY KEY,par INTEGER,handicap INTEGER);');

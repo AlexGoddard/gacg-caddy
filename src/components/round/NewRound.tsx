@@ -4,6 +4,10 @@ import {
   Fieldset,
   Grid,
   Group,
+  NumberInput,
+  NumberInputProps,
+  Paper,
+  SelectProps,
   SimpleGrid,
   Skeleton,
   Stack,
@@ -16,15 +20,19 @@ import { useMutation, useQueries } from '@tanstack/react-query';
 
 import * as notifications from 'components/notifications';
 import { SplitData } from 'components/common/data-display';
-import { DaySelector, HoleInput, PlayerSelect } from 'components/common/form-inputs';
-import { TournamentDay } from 'components/constants';
+import { DaySelector, PlayerSelect } from 'components/common/form-inputs';
+import { Division, TournamentDay } from 'components/constants';
 import { getGross, getIn, getNet, getOut, getTournamentDay } from 'components/util';
 
-import { useHolesQuery } from 'hooks/holes';
-import { Player, usePlayersQuery } from 'hooks/players';
+import { Hole, useHolesQuery } from 'hooks/holes';
+import { Player, usePlayers, usePlayersQuery } from 'hooks/players';
 import { Round, saveRound } from 'hooks/rounds';
 
 import './style.less';
+
+interface HoleInputProps extends NumberInputProps {
+  hole: Hole;
+}
 
 interface NewRoundFormData {
   player?: Player;
@@ -112,7 +120,7 @@ export function NewRound(props: NewRoundProps) {
         <DaySelector {...form.getInputProps('day')} />
         <Fieldset legend="Player Info">
           <Group>
-            <PlayerSelect data-autofocus {...form.getInputProps('playerId')} />
+            <PlayerSelectByDivision data-autofocus {...form.getInputProps('playerId')} />
             {selectedPlayer && (
               <>
                 <Badge variant="filled">Division: {selectedPlayer.division}</Badge>
@@ -181,5 +189,51 @@ export const NewRoundTitle = () => {
       New Round
       <IconGolf className="headerIcon" />
     </Text>
+  );
+};
+
+const HoleInput = (props: HoleInputProps) => {
+  const { hole, ...otherProps } = props;
+  return (
+    <Stack gap="0" justify="flex-start" align="center" className="hole">
+      <NumberInput
+        {...otherProps}
+        label={hole.holeNumber}
+        hideControls
+        min={1}
+        max={99}
+        clampBehavior="strict"
+        allowNegative={false}
+        allowDecimal={false}
+        onFocus={(e) => e.target.select()}
+        classNames={{ input: 'holeInput' }}
+      />
+      <Paper className="holeInfo">{hole.par}</Paper>
+    </Stack>
+  );
+};
+
+const PlayerSelectByDivision = (props: SelectProps) => {
+  const { status, error, data } = usePlayers();
+  const players = status === 'success' ? data : [];
+
+  const getPlayerItemsByDivision = (division: Division) =>
+    players
+      .filter((player) => player.division === division)
+      .map((player) => ({
+        value: player.id.toString(),
+        label: player.fullName,
+      }));
+
+  return (
+    <PlayerSelect
+      data={Object.values(Division).map((division) => ({
+        group: `${division.toUpperCase()} Division`,
+        items: getPlayerItemsByDivision(division),
+      }))}
+      playersQueryStatus={status}
+      playersQueryError={error}
+      {...props}
+    />
   );
 };

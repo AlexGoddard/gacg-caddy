@@ -5,20 +5,15 @@ import {
   Loader,
   NumberInput,
   NumberInputProps,
-  Paper,
   Select,
   SelectProps,
-  Stack,
   Text,
   rem,
 } from '@mantine/core';
 import { IconCurrencyDollar } from '@tabler/icons-react';
 
 import { ErrorFeedback } from 'components/common/feedback';
-import { Division, TournamentDay } from 'components/constants';
-
-import { Hole } from 'hooks/holes';
-import { usePlayers } from 'hooks/players';
+import { TournamentDay } from 'components/constants';
 
 import './style.less';
 
@@ -26,8 +21,9 @@ interface DaySelectorProps extends ChipGroupProps {
   days?: TournamentDay[];
 }
 
-interface HoleInputProps extends NumberInputProps {
-  hole: Hole;
+interface PlayerSelectProps extends SelectProps {
+  playersQueryStatus: 'error' | 'success' | 'pending';
+  playersQueryError: Error | null;
 }
 
 interface PrizePoolInputProps extends NumberInputProps {
@@ -77,59 +73,24 @@ export const PrizePoolInput = (props: PrizePoolInputProps) => {
   );
 };
 
-export const HoleInput = (props: HoleInputProps) => {
-  const { hole, ...otherProps } = props;
-  return (
-    <Stack gap="0" justify="flex-start" align="center" className="hole">
-      <NumberInput
-        {...otherProps}
-        label={hole.holeNumber}
-        hideControls
-        min={1}
-        max={99}
-        clampBehavior="strict"
-        allowNegative={false}
-        allowDecimal={false}
-        onFocus={(e) => e.target.select()}
-        classNames={{ input: 'holeInput' }}
-      />
-      <Paper className="holeInfo">{hole.par}</Paper>
-    </Stack>
-  );
-};
-
-export const PlayerSelect = (props: SelectProps) => {
-  const { isPending, isSuccess, isError, error, data } = usePlayers();
-  const players = isSuccess ? data : [];
-
-  const getPlayerItemsByDivision = (division: Division) =>
-    players
-      .filter((player) => player.division === division)
-      .map((player) => ({
-        value: player.id.toString(),
-        label: player.fullName,
-      }));
-
+export const PlayerSelect = (props: PlayerSelectProps) => {
+  const { playersQueryStatus, playersQueryError, ...otherProps } = props;
   return (
     <Group gap="xs">
       <Select
         aria-label="Player select"
-        placeholder={isPending ? 'Loading players..' : 'Search players..'}
-        disabled={!isSuccess}
-        data={Object.values(Division).map((division) => ({
-          group: `${division.toUpperCase()} Division`,
-          items: getPlayerItemsByDivision(division),
-        }))}
+        placeholder={playersQueryStatus === 'pending' ? 'Loading players..' : 'Search players..'}
+        disabled={playersQueryStatus !== 'success'}
         comboboxProps={{
           transitionProps: { transition: 'pop', duration: 300 },
         }}
         searchable
         clearable
         selectFirstOptionOnChange
-        {...props}
+        {...otherProps}
       />
-      {isPending && <Loader size="xs" />}
-      {isError && <ErrorFeedback label={error.message} />}
+      {playersQueryStatus === 'pending' && <Loader size="xs" />}
+      {playersQueryStatus === 'error' && <ErrorFeedback label={playersQueryError!.message} />}
     </Group>
   );
 };

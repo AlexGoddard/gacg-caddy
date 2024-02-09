@@ -13,7 +13,8 @@ export interface CalcuttaTeamHoles {
   team: number[];
 }
 
-export interface NewPlayer {
+export interface FormPlayer {
+  id?: number;
   firstName: string;
   lastName: string;
   division: Division;

@@ -4,6 +4,14 @@
   text-align: center;
 }
 
+/* Temporarily remove scrollbar as it is clashing with
+ * the title bar overlay controls. Need to create a 
+ * custom scrollbar for the main content area.
+ */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
 body {
   /* App Variables */
   --gacg-color-body: var(--mantine-color-slate-9);
@@ -54,6 +62,11 @@ body {
 
 .gacgInputSection > svg {
   color: var(--gacg-color-dimmed);
+}
+
+.gacgMenuItem:hover {
+  color: var(--gacg-color-body);
+  background-color: var(--gacg-color-selected);
 }
 
 .gacgModalCloseButton:hover {

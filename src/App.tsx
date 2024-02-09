@@ -18,15 +18,15 @@ import { Rounds } from 'components/round/Rounds';
 import './App.css';
 
 function App() {
+  const queryClient = new QueryClient();
   const [activeRoute, setActiveRoute] = useState(0);
   const [navOpened, { toggle }] = useDisclosure(true);
 
-  const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
       <HashRouter>
         <AppShell
-          header={{ height: 60 }}
+          header={{ height: 35 }}
           navbar={{
             width: 200,
             breakpoint: 'sm',
@@ -36,7 +36,7 @@ function App() {
           withBorder={false}
         >
           <AppShell.Header>
-            <Header toggle={toggle} setActiveRoute={setActiveRoute} />
+            <Header toggle={toggle} />
           </AppShell.Header>
           <AppShell.Navbar>
             <Navbar activeRoute={activeRoute} setActiveRoute={setActiveRoute} toggle={toggle} />

@@ -23,3 +23,11 @@ export const post = async (path: string, args: object) => {
     throw new Error('Web requests not yet implemented');
   }
 };
+
+export const put = async (path: string, args: object) => {
+  if (isElectron()) {
+    return window.ipcRenderer.invoke(`${path}/put`, args);
+  } else {
+    throw new Error('Web requests not yet implemented');
+  }
+};

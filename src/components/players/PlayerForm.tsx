@@ -6,52 +6,54 @@ import {
   Select,
   Stack,
   StackProps,
-  Text,
   TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconArrowRight, IconUser } from '@tabler/icons-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { IconArrowRight } from '@tabler/icons-react';
 
-import * as notifications from 'components/notifications';
 import { Division } from 'components/constants';
 import { capitalize } from 'components/util';
 
-import { NewPlayer, savePlayer } from 'hooks/players';
+import { Player } from 'hooks/players';
 
 import './style.less';
 
-interface NewPlayerFormData {
+export interface PlayerFormData {
   firstName: string;
   lastName: string;
   division: Division;
   handicap: number;
 }
 
-interface NewPlayerProps extends StackProps {
-  closeModal: () => void;
+interface PlayerFormProps extends Omit<StackProps, 'onSubmit'> {
+  player?: Player;
+  onSubmit: (data: PlayerFormData) => Promise<void>;
 }
 
-export function NewPlayerForm(props: NewPlayerProps) {
-  const { closeModal, ...otherProps } = props;
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: (newPlayer: NewPlayer) => savePlayer(newPlayer),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['players'] }),
-  });
+export function PlayerForm(props: PlayerFormProps) {
+  const { player, onSubmit, ...otherProps } = props;
+
+  const initialValues = player
+    ? {
+        firstName: player.firstName,
+        lastName: player.lastName,
+        division: player.division,
+        handicap: player.handicap,
+      }
+    : {
+        firstName: '',
+        lastName: '',
+        division: Division.A,
+        handicap: '',
+      };
 
   const form = useForm({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      division: Division.A,
-      handicap: '',
-    },
+    initialValues: initialValues,
 
     validate: {
       firstName: (value) => (value != '' ? null : 'First name is required'),
       lastName: (value) => (value != '' ? null : 'Last name is required'),
-      handicap: (value) => (value != '' ? null : 'Handicap is required'),
+      handicap: (value: string | number) => (value != '' ? null : 'Handicap is required'),
     },
 
     transformValues: (values) => ({
@@ -61,21 +63,6 @@ export function NewPlayerForm(props: NewPlayerProps) {
       handicap: Number(values.handicap),
     }),
   });
-
-  const onSubmit = async (data: NewPlayerFormData) => {
-    const loadingNotification = notifications.loading('Saving player..');
-
-    mutation.mutate(data, {
-      onSettled: (newPlayer) => {
-        if (newPlayer) {
-          closeModal();
-          notifications.updateSuccess(loadingNotification, 'Saved player');
-        } else {
-          notifications.updateFailure(loadingNotification, 'Failed to save player');
-        }
-      },
-    });
-  };
 
   return (
     <form onSubmit={form.onSubmit((values) => onSubmit(values))} onReset={form.onReset}>
@@ -109,22 +96,13 @@ export function NewPlayerForm(props: NewPlayerProps) {
         </Fieldset>
         <Group justify="flex-end">
           <Button type="reset" variant="subtle">
-            Clear
+            {player ? 'Reset' : 'Clear'}
           </Button>
           <Button type="submit" rightSection={<IconArrowRight size={14} />}>
-            Submit
+            {player ? 'Update Player' : 'Add Player'}
           </Button>
         </Group>
       </Stack>
     </form>
   );
 }
-
-export const NewPlayerTitle = () => {
-  return (
-    <Text fz="xl" fw="bold">
-      New Player
-      <IconUser className="headerIcon" />
-    </Text>
-  );
-};

@@ -150,7 +150,7 @@ export const Scorecard = (props: ScorecardProps) => {
         </Table.Tbody>
       </Table>
       {isError && (
-        <Overlay color="#000" backgroundOpacity={0.4} blur={5}>
+        <Overlay color="#000" backgroundOpacity={0.4} blur={5} zIndex={99}>
           <Flex justify="center" align="center" h="100%">
             <Title order={2}>Failed to load scorecard</Title>
           </Flex>

@@ -27,6 +27,12 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#2E3440',
+      symbolColor: '#7D8595',
+      height: 35,
+    },
   });
 
   // Test active push message to Renderer-process.
@@ -62,6 +68,12 @@ app.on('activate', () => {
 
 app.whenReady().then(createWindow);
 
+// Calcutta
+
+ipcMain.handle('/calcutta/teams/post', (_, args) => {
+  return dbm.createCalcuttaTeam(args.aPlayerId, args.bPlayerId);
+});
+
 ipcMain.handle('/calcutta/get', (_, args) => {
   return dbm.getCalcutta(args.day);
 });
@@ -74,36 +86,60 @@ ipcMain.handle('/calcutta/teams/holes/get', (_, args) => {
   return dbm.getCalcuttaTeamHoles(args.day, args.scoreType, args.aPlayerId, args.bPlayerId);
 });
 
-ipcMain.handle('/deuces/get', (_, args) => {
+ipcMain.handle('/calcutta/teams/partner/get', (_, args) => {
+  return dbm.getCalcuttaPartner(args.playerId);
+});
+
+ipcMain.handle('/calcutta/players/available/get', (_, args) => {
+  return dbm.getAvailablePartners(args.division);
+});
+
+ipcMain.handle('/calcutta/teams/delete', (_, args) => {
+  return dbm.deleteCalcuttaTeam(args.playerId);
+});
+
+// Games
+
+ipcMain.handle('/games/deuces/get', (_, args) => {
   return dbm.getDeuces(args.day);
 });
+
+ipcMain.handle('/games/payballs/get', (_, args) => {
+  return dbm.getPayballs(args.day);
+});
+
+// Holes
 
 ipcMain.handle('/holes/get', () => {
   return dbm.getHoles();
 });
 
-ipcMain.handle('/payballs/get', (_, args) => {
-  return dbm.getPayballs(args.day);
-});
+// Players
 
-ipcMain.handle('/players/delete', (_, args) => {
-  return dbm.deletePlayers(args.playerIds);
+ipcMain.handle('/players/post', (_, args) => {
+  return dbm.createPlayer(args.player);
 });
 
 ipcMain.handle('/players/get', () => {
   return dbm.getPlayers();
 });
 
-ipcMain.handle('/players/post', (_, args) => {
-  return dbm.savePlayer(args.player);
+ipcMain.handle('/players/put', (_, args) => {
+  return dbm.updatePlayer(args.player);
+});
+
+ipcMain.handle('/players/delete', (_, args) => {
+  return dbm.deletePlayer(args.playerId);
+});
+
+// Scores
+
+ipcMain.handle('/rounds/post', (_, args) => {
+  return dbm.addRound(args.round);
 });
 
 ipcMain.handle('/rounds/get', (_, args) => {
-  return dbm.getRounds(args.day);
-});
-
-ipcMain.handle('/rounds/post', (_, args) => {
-  return dbm.saveRound(args.round);
+  return dbm.getRounds(args.day, args.playerId);
 });
 
 ipcMain.handle('/scores/get', (_, args) => {

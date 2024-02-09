@@ -1,11 +1,18 @@
 .headerContainer {
   height: 100%;
-  padding-left: 1rem;
+  -webkit-app-region: drag;
+}
+
+.headerShadow {
+  box-shadow: var(--mantine-shadow-sm);
+}
+
+.headerContainer button {
+  -webkit-app-region: no-drag;
 }
 
 .navControl {
   font-size: 0 !important;
-  border-radius: 50%;
 }
 
 .navControl:hover {

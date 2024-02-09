@@ -2,12 +2,15 @@ import {
   ActionIcon,
   Button,
   Chip,
+  Divider,
   Fieldset,
   Input,
+  Menu,
   Modal,
   NavLink,
   Notification,
   Paper,
+  Popover,
   Select,
   Table,
   createTheme,
@@ -196,6 +199,11 @@ export const theme = createTheme({
         label: 'gacgChipLabel',
       },
     }),
+    Divider: Divider.extend({
+      styles: {
+        root: { borderColor: 'var(--gacg-color-border)' },
+      },
+    }),
     Fieldset: Fieldset.extend({
       styles: {
         root: {
@@ -213,6 +221,23 @@ export const theme = createTheme({
         input: {
           backgroundColor: 'var(--mantine-color-slate-8)',
           borderColor: 'var(--mantine-color-slate-6)',
+        },
+      },
+    }),
+    Menu: Menu.extend({
+      classNames: {
+        item: 'gacgMenuItem',
+      },
+      styles: {
+        dropdown: {
+          backgroundColor: 'var(--mantine-color-slate-7)',
+          borderColor: 'var(--gacg-color-border)',
+        },
+        divider: {
+          borderColor: 'var(--gacg-color-border)',
+        },
+        label: {
+          color: 'var(--mantine-color-snow-4)',
         },
       },
     }),
@@ -236,6 +261,18 @@ export const theme = createTheme({
         root: { borderColor: 'var(--mantine-color-slate-6)' },
       },
     }),
+    Popover: Popover.extend({
+      styles: {
+        dropdown: {
+          backgroundColor: 'var(--gacg-color-body)',
+          borderColor: 'var(--gacg-color-border)',
+        },
+        arrow: {
+          backgroundColor: 'var(--gacg-color-body)',
+          borderColor: 'var(--gacg-color-border)',
+        },
+      },
+    }),
     Select: Select.extend({
       classNames: {
         groupLabel: 'gacgSelectGroupLabel',
@@ -257,4 +294,7 @@ export const theme = createTheme({
   cursorType: 'pointer',
   primaryColor: 'cyprus',
   primaryShade: 3,
+  spacing: {
+    xxs: 'calc(0.375rem * var(--mantine-scale))',
+  },
 });
