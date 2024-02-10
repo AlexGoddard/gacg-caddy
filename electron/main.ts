@@ -86,14 +86,6 @@ ipcMain.handle('/calcutta/teams/holes/get', (_, args) => {
   return dbm.getCalcuttaTeamHoles(args.day, args.scoreType, args.aPlayerId, args.bPlayerId);
 });
 
-ipcMain.handle('/calcutta/teams/partner/get', (_, args) => {
-  return dbm.getCalcuttaPartner(args.playerId);
-});
-
-ipcMain.handle('/calcutta/players/available/get', (_, args) => {
-  return dbm.getAvailablePartners(args.division);
-});
-
 ipcMain.handle('/calcutta/teams/delete', (_, args) => {
   return dbm.deleteCalcuttaTeam(args.playerId);
 });
@@ -122,6 +114,14 @@ ipcMain.handle('/players/post', (_, args) => {
 
 ipcMain.handle('/players/get', () => {
   return dbm.getPlayers();
+});
+
+ipcMain.handle('/players/available/get', (_, args) => {
+  return dbm.getAvailablePartners(args.division);
+});
+
+ipcMain.handle('/players/partner/get', (_, args) => {
+  return dbm.getPartner(args.playerId);
 });
 
 ipcMain.handle('/players/put', (_, args) => {

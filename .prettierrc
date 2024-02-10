@@ -5,9 +5,10 @@
     "^(react|react-dom|react-router-dom)$",
     "<THIRD_PARTY_MODULES>",
     "^(?!\\.).*.css",
-    "^components/(.*)$",
+    "^(components|pages)/(.*)$",
+    "^(data|utils)/(.*)$",
     "^hooks/(.*)$",
-    "^util/(.*)$",
+    "^assets/(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,

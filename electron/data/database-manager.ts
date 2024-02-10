@@ -2,7 +2,7 @@ import { app } from 'electron';
 import fs from 'fs';
 import path from 'node:path';
 
-import { Division } from 'components/constants';
+import { Division } from 'data/constants';
 
 import { ScoreType, TournamentDay } from '../constants';
 import { CalcuttaTeam, CalcuttaTeamHoles, FormPlayer, Payballs, Round } from '../interface';
@@ -159,7 +159,7 @@ export const getCalcuttaTeamHoles = (
   };
 };
 
-export const getCalcuttaPartner = (playerId: number) => {
+export const getPartner = (playerId: number) => {
   const calcuttaPartnerQuery = db.prepare(`
     WITH partner
       AS (SELECT aPlayerId as playerId

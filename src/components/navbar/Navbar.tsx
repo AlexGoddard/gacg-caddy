@@ -10,7 +10,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 
-import { useDevice } from 'components/util';
+import { useDevice } from 'hooks/useDevice';
 
 interface NavbarProps {
   activeRoute: number;

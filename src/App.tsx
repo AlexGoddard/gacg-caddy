@@ -6,16 +6,16 @@ import { useDisclosure } from '@mantine/hooks';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import { Calcutta } from 'components/calcutta/Calcutta';
-import { Dashboard } from 'components/dashboard/Dashboard';
-import { Deuces } from 'components/deuces/Deuces';
 import { Header } from 'components/header/Header';
 import { Navbar } from 'components/navbar/Navbar';
-import { Payballs } from 'components/payballs/Payballs';
-import { Players } from 'components/players/Players';
-import { Rounds } from 'components/round/Rounds';
+import { Calcutta } from 'pages/calcutta/Calcutta';
+import { Dashboard } from 'pages/dashboard/Dashboard';
+import { Deuces } from 'pages/deuces/Deuces';
+import { Payballs } from 'pages/payballs/Payballs';
+import { Players } from 'pages/players/Players';
+import { Rounds } from 'pages/rounds/Rounds';
 
-import './App.css';
+import 'assets/global.less';
 
 function App() {
   const queryClient = new QueryClient();
