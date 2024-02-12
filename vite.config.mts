@@ -1,7 +1,9 @@
-import { defineConfig } from 'vite';
-import path from 'node:path';
-import electron from 'vite-plugin-electron/simple';
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
 import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import { defineConfig } from 'vite';
+import electron from 'vite-plugin-electron/simple';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
@@ -24,4 +26,9 @@ export default defineConfig({
       renderer: {},
     }),
   ],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './vitest.setup.mts',
+  },
 });

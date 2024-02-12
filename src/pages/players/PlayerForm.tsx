@@ -12,7 +12,7 @@ import { useForm } from '@mantine/form';
 import { IconArrowRight } from '@tabler/icons-react';
 
 import { Division } from 'data/constants';
-import { capitalize } from 'utils/string';
+import { formatName } from 'utils/string';
 
 import { Player } from 'hooks/players/model';
 
@@ -55,8 +55,8 @@ export function PlayerForm(props: PlayerFormProps) {
     },
 
     transformValues: (values) => ({
-      firstName: capitalize(values.firstName),
-      lastName: capitalize(values.lastName),
+      firstName: formatName(values.firstName),
+      lastName: formatName(values.lastName),
       division: values.division,
       handicap: Number(values.handicap),
     }),

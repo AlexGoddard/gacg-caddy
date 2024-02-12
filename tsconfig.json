@@ -7,6 +7,7 @@
       "hooks/*": ["./src/hooks/*"],
       "pages/*": ["./src/pages/*"],
       "utils/*": ["./src/utils/*"],
+      "test-utils": ["./test-utils"],
     },
     "target": "ES2020",
     "useDefineForClassFields": true,
@@ -27,7 +28,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+
+    /* Testing */
+    "types": ["vitest/globals"],
   },
-  "include": ["src", "electron"],
+  "include": ["src", "electron", "vitest.setup.mts"],
   "references": [{ "path": "./tsconfig.node.json" }],
 }

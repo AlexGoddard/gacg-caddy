@@ -25,4 +25,5 @@ release
 *.sln
 *.sw?
 
+coverage/
 out/
