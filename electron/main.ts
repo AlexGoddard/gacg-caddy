@@ -145,3 +145,7 @@ ipcMain.handle('/rounds/get', (_, args) => {
 ipcMain.handle('/scores/get', (_, args) => {
   return dbm.getScores(args.day, args.scoreType, args.playerId);
 });
+
+ipcMain.handle('/rounds/put', (_, args) => {
+  return dbm.updateRound(args.round);
+});

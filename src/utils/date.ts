@@ -4,7 +4,8 @@ export const getTournamentYear = () => {
   const currentDate = new Date();
   return currentDate.getFullYear();
 };
-export function getTournamentDay() {
+
+export const getTournamentDay = () => {
   const currentDate = new Date();
   switch (currentDate.getDay()) {
     case 0:
@@ -14,4 +15,4 @@ export function getTournamentDay() {
     default:
       return TournamentDay.FRIDAY;
   }
-}
+};

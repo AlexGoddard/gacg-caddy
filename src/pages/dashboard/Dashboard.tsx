@@ -2,7 +2,7 @@ import { Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
 import { AddButton } from 'components/controls/Buttons';
-import { NewRound, NewRoundTitle } from 'pages/rounds/NewRound';
+import { NewRoundForm, NewRoundFormTitle } from 'pages/rounds/NewRoundForm';
 
 import { DEFAULT_OVERLAY } from 'data/constants';
 
@@ -17,12 +17,12 @@ export function Dashboard() {
       <Modal
         opened={opened}
         onClose={close}
-        title={<NewRoundTitle />}
+        title={<NewRoundFormTitle />}
         size="xl"
         fullScreen={isMobile}
         overlayProps={DEFAULT_OVERLAY}
       >
-        <NewRound closeModal={close} />
+        <NewRoundForm closeModal={close} />
       </Modal>
 
       <AddButton size="xl" aria-label="Add new round" onClick={open} />

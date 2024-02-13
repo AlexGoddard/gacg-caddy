@@ -19,8 +19,10 @@ export const PlayerScorecard = (props: PlayerScorecardProps) => {
   const { day, scoreType, player, ...otherProps } = props;
   const { status, data } = useScores(day, scoreType, player.id);
 
-  const placeholderRow = (index: number) => ({
-    name: `Placeholder${index}`,
+  const placeholderRow = (day: TournamentDay) => ({
+    playerId: -1,
+    day: day,
+    label: day,
     scores: PLACEHOLDER_SCORES,
   });
   const days =
@@ -29,8 +31,13 @@ export const PlayerScorecard = (props: PlayerScorecardProps) => {
       : [day];
   const scorecardRows =
     status === 'success'
-      ? data.map((score) => ({ name: score.day, scores: score.scores }))
-      : days.map((_, index) => placeholderRow(index));
+      ? data.map((score) => ({
+          playerId: player.id,
+          day: score.day,
+          label: score.day,
+          scores: score.scores,
+        }))
+      : days.map((day) => placeholderRow(day));
 
   return (
     <Scorecard

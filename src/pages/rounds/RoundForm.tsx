@@ -17,10 +17,9 @@ import {
   Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconArrowRight, IconGolf } from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
 import { useQueries } from '@tanstack/react-query';
 
-import * as notifications from 'components/feedback/notifications';
 import { DaySelector } from 'components/controls/DaySelector';
 import { PlayerSelect } from 'components/inputs/PlayerSelect';
 
@@ -32,7 +31,7 @@ import { Hole } from 'hooks/holes/model';
 import { useHolesQuery } from 'hooks/holes/useHoles';
 import { Player } from 'hooks/players/model';
 import { usePlayers, usePlayersQuery } from 'hooks/players/usePlayers';
-import { useCreateRound } from 'hooks/rounds/useCreateRound';
+import { Round } from 'hooks/rounds/model';
 
 import './style.less';
 
@@ -40,14 +39,16 @@ interface HoleInputProps extends NumberInputProps {
   hole: Hole;
 }
 
-interface NewRoundFormData {
+export interface RoundFormData {
   player?: Player;
   day: TournamentDay;
+  previousDay?: TournamentDay;
   grossHoles: number[];
 }
 
-interface NewRoundProps extends StackProps {
-  closeModal: () => void;
+interface RoundFormProps extends Omit<StackProps, 'onSubmit'> {
+  round?: Round;
+  onSubmit: (data: RoundFormData) => Promise<void>;
 }
 
 interface SplitDataProps extends StackProps {
@@ -55,59 +56,42 @@ interface SplitDataProps extends StackProps {
   bottomSection: ReactNode;
 }
 
-export function NewRound(props: NewRoundProps) {
-  const { closeModal, ...otherProps } = props;
-  const createRoundMutation = useCreateRound();
+export function RoundForm(props: RoundFormProps) {
+  const { round, onSubmit, ...otherProps } = props;
   const [playersQuery, holesQuery] = useQueries({ queries: [usePlayersQuery, useHolesQuery] });
   const players = playersQuery.isSuccess ? playersQuery.data : [];
   const holes = holesQuery.isSuccess ? holesQuery.data : [];
 
+  const initialValues = round
+    ? {
+        playerId: round.playerId.toString(),
+        day: round.day,
+        previousDay: round.day,
+        grossHoles: round.grossHoles.map((hole) => ({ score: hole })),
+      }
+    : {
+        playerId: null,
+        day: getTournamentDay(),
+        grossHoles: new Array(18).fill({ score: '' }),
+      };
+
   const form = useForm({
-    initialValues: {
-      playerId: null,
-      day: getTournamentDay(),
-      grossHoles: new Array(18).fill({ score: '' }),
-    },
+    initialValues: initialValues,
 
     validate: {
-      playerId: (value) => (value != null ? null : 'Player is required'),
+      playerId: (value: string | null) => (value != null ? null : 'Player is required'),
       grossHoles: {
-        score: (value) => (Number(value) > 0 ? null : true),
+        score: (value: string | number) => (Number(value) > 0 ? null : true),
       },
     },
 
     transformValues: (values) => ({
       player: players.find((player) => player.id === Number(values.playerId)),
       day: values.day,
+      previousDay: values.previousDay,
       grossHoles: values.grossHoles.map((hole) => Number(hole.score)),
     }),
   });
-
-  const onSubmit = async (data: NewRoundFormData) => {
-    if (data.player) {
-      const loadingNotification = notifications.loading('Saving round..');
-
-      createRoundMutation.mutate(
-        { playerId: data.player.id, day: data.day, grossHoles: data.grossHoles },
-        {
-          onSuccess: async (response) => {
-            if (response === true) {
-              notifications.updateSuccess(loadingNotification, 'Saved round');
-              closeModal();
-            } else {
-              notifications.updateFailure(loadingNotification, 'Failed to save round');
-            }
-          },
-          onError: async () => {
-            notifications.updateFailure(loadingNotification, 'Failed to save round');
-          },
-        },
-      );
-    } else {
-      // If player is removed between selecting and submitting
-      form.setErrors({ playerId: 'Selected player no longer exists' });
-    }
-  };
 
   const holeInputs = holes.map((hole, index) => (
     <HoleInput
@@ -129,7 +113,11 @@ export function NewRound(props: NewRoundProps) {
         <DaySelector {...form.getInputProps('day')} />
         <Fieldset legend="Player Info">
           <Group>
-            <PlayerSelectByDivision data-autofocus {...form.getInputProps('playerId')} />
+            <PlayerSelectByDivision
+              readOnly={round ? true : false}
+              data-autofocus
+              {...form.getInputProps('playerId')}
+            />
             {selectedPlayer && (
               <>
                 <Badge variant="filled">Division: {selectedPlayer.division}</Badge>
@@ -181,25 +169,16 @@ export function NewRound(props: NewRoundProps) {
         </Skeleton>
         <Group justify="flex-end">
           <Button type="reset" variant="subtle">
-            Clear
+            {round ? 'Reset' : 'Clear'}
           </Button>
           <Button type="submit" rightSection={<IconArrowRight size={14} />}>
-            Submit
+            {round ? 'Update Round' : 'Add Round'}
           </Button>
         </Group>
       </Stack>
     </form>
   );
 }
-
-export const NewRoundTitle = () => {
-  return (
-    <Text fz="xl" fw="bold">
-      New Round
-      <IconGolf className="headerIcon" />
-    </Text>
-  );
-};
 
 const HoleInput = (props: HoleInputProps) => {
   const { hole, ...otherProps } = props;

@@ -1,3 +1,5 @@
+import { TournamentDay } from 'data/constants';
+
 import { Division, ScoreType } from './constants';
 
 export interface CalcuttaTeam {
@@ -28,8 +30,12 @@ export interface Payballs {
 
 export interface Round {
   playerId: number;
-  day: string;
+  day: TournamentDay;
   grossHoles: number[];
+}
+
+export interface EditedRound extends Round {
+  previousDay: TournamentDay;
 }
 
 interface PlayerInfo {

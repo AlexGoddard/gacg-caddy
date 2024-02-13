@@ -5,7 +5,14 @@ import path from 'node:path';
 import { Division } from 'data/constants';
 
 import { ScoreType, TournamentDay } from '../constants';
-import { CalcuttaTeam, CalcuttaTeamHoles, FormPlayer, Payballs, Round } from '../interface';
+import {
+  CalcuttaTeam,
+  CalcuttaTeamHoles,
+  EditedRound,
+  FormPlayer,
+  Payballs,
+  Round,
+} from '../interface';
 import { getWhereClause } from './util';
 
 const DB_PATH = path.join(app.getPath('userData'), 'gacg.sqlite');
@@ -383,6 +390,45 @@ export const getScores = (day: TournamentDay, scoreType: ScoreType, playerId: nu
     }
   });
   return scores;
+};
+
+export const updateRound = (editedRound: EditedRound) => {
+  try {
+    const scores = editedRound.grossHoles.map((holeScore, index) => {
+      return {
+        playerId: editedRound.playerId,
+        day: editedRound.day,
+        previousDay: editedRound.previousDay,
+        holeNumber: index + 1,
+        gross: holeScore,
+      };
+    });
+    const updateScore = db.prepare(`
+      UPDATE scores
+      SET day=@day,
+          gross=@gross
+      WHERE playerId=@playerId AND day=@previousDay AND holeNumber=@holeNumber;
+    `);
+    const updateManyScores = db.transaction((scores: []) => {
+      for (const score of scores) updateScore.run(score);
+    });
+    updateManyScores(scores);
+    const updatedScores = db.prepare(`
+      SELECT gross FROM scores
+      WHERE playerId=@playerId AND day=@day
+      ORDER BY holeNumber;
+    `);
+    return {
+      playerId: editedRound.playerId,
+      day: editedRound.day,
+      grossHoles: updatedScores
+        .all({ playerId: editedRound.playerId, day: editedRound.day })
+        .map((score: { gross: number }) => score.gross),
+    };
+  } catch (err) {
+    console.log(err);
+    return;
+  }
 };
 
 // Database Setup

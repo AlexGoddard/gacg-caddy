@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { post } from 'utils/network';
+import { put } from 'utils/network';
 
-import { Round } from 'hooks/rounds/model';
+import { EditedRound, Round } from 'hooks/rounds/model';
 import { ROUNDS_PATH } from 'hooks/rounds/useRounds';
 import { SCORES_PATH } from 'hooks/rounds/useScores';
 
-export const useCreateRound = () => {
+export const useUpdateRound = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newRound: Round) => createRound(newRound),
+    mutationFn: (editedRound: EditedRound) => updateRound(editedRound),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [ROUNDS_PATH] });
       queryClient.invalidateQueries({ queryKey: [SCORES_PATH] });
@@ -17,6 +17,6 @@ export const useCreateRound = () => {
   });
 };
 
-function createRound(newRound: Round): Promise<boolean> {
-  return post(`/${ROUNDS_PATH}`, { round: newRound }).then((response) => response);
+function updateRound(editedRound: EditedRound): Promise<Round> {
+  return put(`/${ROUNDS_PATH}`, { round: editedRound }).then((response) => response);
 }

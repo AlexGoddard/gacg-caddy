@@ -1,5 +1,9 @@
 import { TournamentDay } from 'data/constants';
 
+export interface EditedRound extends Round {
+  previousDay: TournamentDay;
+}
+
 export interface PlayerInfo {
   id: number;
   name: string;

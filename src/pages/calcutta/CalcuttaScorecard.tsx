@@ -19,18 +19,21 @@ interface CalcuttaScorecardProps extends CalcuttaScorecardData, TableProps {}
 export const CalcuttaScorecard = (props: CalcuttaScorecardProps) => {
   const { day, scoreType, a, b, ...otherProps } = props;
   const { status, data } = useCalcuttaTeamHoles(day, scoreType, a.id, b.id);
+
+  const placeholderRow = (label: string) => ({
+    playerId: -1,
+    day: day,
+    label: label,
+    scores: PLACEHOLDER_SCORES,
+  });
   const scorecardRows =
     status === 'success'
       ? [
-          { name: a.name, scores: data.a },
-          { name: b.name, scores: data.b },
-          { name: 'Team', scores: data.team, isTeamScore: true },
+          { playerId: a.id, day: day, label: a.name, scores: data.a },
+          { playerId: b.id, day: day, label: b.name, scores: data.b },
+          { day: day, label: 'Team', scores: data.team },
         ]
-      : [
-          { name: 'Placeholder1..', scores: PLACEHOLDER_SCORES },
-          { name: 'Placeholder2..', scores: PLACEHOLDER_SCORES },
-          { name: 'Placeholder3..', scores: PLACEHOLDER_SCORES },
-        ];
+      : ['A Player', 'B Player', 'Team'].map((label) => placeholderRow(label));
 
   return (
     <Scorecard

@@ -13,6 +13,6 @@ export const useUpdatePlayer = () => {
   });
 };
 
-function updatePlayer(updatedPlayer: FormPlayer): Promise<Player> {
-  return put(`/${PLAYERS_PATH}`, { player: updatedPlayer }).then((response) => response);
+function updatePlayer(editedPlayer: FormPlayer): Promise<Player> {
+  return put(`/${PLAYERS_PATH}`, { player: editedPlayer }).then((response) => response);
 }
