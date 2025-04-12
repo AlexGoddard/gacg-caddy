@@ -19,12 +19,17 @@ const ELIGIBLE_DAYS = [TournamentDay.FRIDAY, TournamentDay.SATURDAY];
 export function Deuces() {
   const currentTournamentDay = getTournamentDay();
   const [tournamentDay, setTournamentDay] = useState(
-    ELIGIBLE_DAYS.includes(currentTournamentDay) ? currentTournamentDay : TournamentDay.FRIDAY,
+    ELIGIBLE_DAYS.includes(currentTournamentDay)
+      ? currentTournamentDay
+      : TournamentDay.FRIDAY,
   );
   const [prizePool, setPrizePool] = useState<string | number>(140);
   const { isSuccess, data } = useDeuces(tournamentDay);
   const deuces = isSuccess ? data : [];
-  const deuceTableData = deuces.map((deuce) => [deuce.player, deuce.holeNumber.toString()]);
+  const deuceTableData = deuces.map((deuce) => [
+    deuce.player,
+    deuce.holeNumber.toString(),
+  ]);
   const deuceValue = Math.floor(
     Number(prizePool) / (deuceTableData.length > 0 ? deuceTableData.length : 1),
   );
@@ -47,8 +52,15 @@ export function Deuces() {
           onChange={(day) => setTournamentDay(day as TournamentDay)}
         />
         <Group>
-          <PrizePoolInput labelId="deucesPrizePool" value={prizePool} onChange={setPrizePool} />
-          <DownloadButton aria-label="Download deuces" onClick={downloadDeuces} />
+          <PrizePoolInput
+            labelId="deucesPrizePool"
+            value={prizePool}
+            onChange={setPrizePool}
+          />
+          <DownloadButton
+            aria-label="Download deuces"
+            onClick={downloadDeuces}
+          />
         </Group>
       </Group>
       <Stack gap={0} title="test">

@@ -7,7 +7,11 @@ import { PlayerScores } from './model';
 
 export const SCORES_PATH = 'scores';
 
-export const useScores = (day: TournamentDay, scoreType: ScoreType, playerId: number) =>
+export const useScores = (
+  day: TournamentDay,
+  scoreType: ScoreType,
+  playerId: number,
+) =>
   useQuery({
     queryKey: [SCORES_PATH, day, scoreType, playerId],
     queryFn: () => fetchScores(day, scoreType, playerId),

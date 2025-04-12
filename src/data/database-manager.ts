@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'node:path';
 
 import { Division } from '../../app/data/constants';
-
 import { ScoreType, TournamentDay } from './constants';
 import {
   CalcuttaTeam,

@@ -55,19 +55,28 @@ export function Calcutta() {
 
   const isSample = tournamentDay !== TournamentDay.SUNDAY;
   const [calcuttaQuery, calcuttaSampleQuery] = useQueries({
-    queries: [useCalcuttaQuery(tournamentDay), useCalcuttaSampleQuery(isSample)],
+    queries: [
+      useCalcuttaQuery(tournamentDay),
+      useCalcuttaSampleQuery(isSample),
+    ],
   });
   const calcutta = calcuttaQuery.isSuccess ? calcuttaQuery.data : [];
 
-  const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map((percent) => percent * Number(prizePool));
-  const grossPayouts = [0.1, 0.05].map((percent) => percent * Number(prizePool));
+  const netPayouts = [0.3, 0.2, 0.15, 0.1, 0.05].map(
+    (percent) => percent * Number(prizePool),
+  );
+  const grossPayouts = [0.1, 0.05].map(
+    (percent) => percent * Number(prizePool),
+  );
 
   const calcuttaTableData = getCalcuttaTableData(calcutta);
 
   const downloadCalcutta = () => {
     const fileName = `calcutta-${isSample ? 'sample-' : ''}${getTournamentYear()}.csv`;
     if (isSample) {
-      const calcuttaSample = calcuttaSampleQuery.isSuccess ? calcuttaSampleQuery.data : [];
+      const calcuttaSample = calcuttaSampleQuery.isSuccess
+        ? calcuttaSampleQuery.data
+        : [];
       const downloadData: DownloadData = {
         headers: [
           'A Player',
@@ -104,8 +113,15 @@ export function Calcutta() {
     }
   };
 
-  const getWinnings = (payouts: number[], teamsAlreadyPlaced: number, numTeams: number) => {
-    return sum(payouts.slice(teamsAlreadyPlaced, teamsAlreadyPlaced + numTeams)) / numTeams;
+  const getWinnings = (
+    payouts: number[],
+    teamsAlreadyPlaced: number,
+    numTeams: number,
+  ) => {
+    return (
+      sum(payouts.slice(teamsAlreadyPlaced, teamsAlreadyPlaced + numTeams)) /
+      numTeams
+    );
   };
 
   const getWinners = () => {
@@ -116,7 +132,10 @@ export function Calcutta() {
     let grossPlaced = 0;
 
     for (const netCalcuttaTeam of calcuttaTableData.net) {
-      if (winners.find((winning) => winning.aPlayer === netCalcuttaTeam.aPlayer)) continue;
+      if (
+        winners.find((winning) => winning.aPlayer === netCalcuttaTeam.aPlayer)
+      )
+        continue;
       if (netPlaced >= netPayouts.length) break;
       const grossWinners: CalcuttaTeamData[] = [];
 
@@ -125,10 +144,13 @@ export function Calcutta() {
       );
       // Determine if each team could win more going gross
       possibleNetWinners.forEach((winner) => {
-        const remainingGrossTeams = calcuttaTableData.gross.filter((possibleMatch) =>
-          grossWinners.find((grossWinner) => grossWinner.aPlayer === possibleMatch.aPlayer)
-            ? false
-            : true,
+        const remainingGrossTeams = calcuttaTableData.gross.filter(
+          (possibleMatch) =>
+            grossWinners.find(
+              (grossWinner) => grossWinner.aPlayer === possibleMatch.aPlayer,
+            )
+              ? false
+              : true,
         );
         const winnerGrossScore = calcuttaTableData.gross.find(
           (possibleMatch) => possibleMatch.aPlayer === winner.aPlayer,
@@ -136,12 +158,17 @@ export function Calcutta() {
         remainingGrossTeams
           .slice(0, grossPayouts.length - grossWinners.length)
           .forEach((remainingGrossTeam, index) => {
-            if (grossWinners.find((grossWinner) => grossWinner.aPlayer === winner.aPlayer)) {
+            if (
+              grossWinners.find(
+                (grossWinner) => grossWinner.aPlayer === winner.aPlayer,
+              )
+            ) {
               return;
             }
             if (remainingGrossTeam.score === winnerGrossScore) {
               const possibleGrossWinners = remainingGrossTeams.filter(
-                (possibleMatch) => possibleMatch.score === remainingGrossTeam.score,
+                (possibleMatch) =>
+                  possibleMatch.score === remainingGrossTeam.score,
               );
               const possibleNetPlaceWinnings = getWinnings(
                 netPayouts,
@@ -156,7 +183,10 @@ export function Calcutta() {
                 possibleGrossWinners.length,
               );
               if (possibleGrossPlaceWinnings > possibleNetPlaceWinnings) {
-                grossWinners.push({ ...winner, ...{ score: winnerGrossScore } });
+                grossWinners.push({
+                  ...winner,
+                  ...{ score: winnerGrossScore },
+                });
               }
             }
           });
@@ -164,7 +194,11 @@ export function Calcutta() {
 
       // Filter out teams that went gross
       const netWinners = possibleNetWinners.filter((winner) =>
-        grossWinners.find((grossWinner) => grossWinner.aPlayer === winner.aPlayer) ? false : true,
+        grossWinners.find(
+          (grossWinner) => grossWinner.aPlayer === winner.aPlayer,
+        )
+          ? false
+          : true,
       );
 
       grossWinners.map((winner) => {
@@ -193,33 +227,51 @@ export function Calcutta() {
     }
 
     if (grossPlaced < grossPayouts.length) {
-      const remainingGrossTeams = calcuttaTableData.gross.filter((possibleMatch) =>
-        winners.find((winning) => winning.aPlayer === possibleMatch.aPlayer) ? false : true,
+      const remainingGrossTeams = calcuttaTableData.gross.filter(
+        (possibleMatch) =>
+          winners.find((winning) => winning.aPlayer === possibleMatch.aPlayer)
+            ? false
+            : true,
       );
       for (const grossTeam of remainingGrossTeams) {
-        if (winners.find((winning) => winning.aPlayer === grossTeam.aPlayer)) continue;
+        if (winners.find((winning) => winning.aPlayer === grossTeam.aPlayer))
+          continue;
         if (grossPlaced >= grossPayouts.length) break;
 
         const grossWinners = remainingGrossTeams.filter(
           (possibleMatch) => possibleMatch.score === grossTeam.score,
         );
-        const grossWinnings = getWinnings(grossPayouts, grossPlaced, grossWinners.length);
+        const grossWinnings = getWinnings(
+          grossPayouts,
+          grossPlaced,
+          grossWinners.length,
+        );
         grossWinners.map((grossWinner) => {
           if (
             winners.find(
               (winner) =>
-                winner.scoreType === ScoreType.GROSS && winner.score === grossWinner.score,
+                winner.scoreType === ScoreType.GROSS &&
+                winner.score === grossWinner.score,
             )
           ) {
             winners.find(
               (winner) =>
-                winner.scoreType === ScoreType.GROSS && winner.score === grossWinner.score,
-            )!.amount = getWinnings(grossPayouts, grossPlaced - 1, grossWinners.length + 1);
+                winner.scoreType === ScoreType.GROSS &&
+                winner.score === grossWinner.score,
+            )!.amount = getWinnings(
+              grossPayouts,
+              grossPlaced - 1,
+              grossWinners.length + 1,
+            );
             winners.push({
               aPlayer: grossWinner.aPlayer,
               bPlayer: grossWinner.bPlayer,
               score: grossWinner.score,
-              amount: getWinnings(grossPayouts, grossPlaced - 1, grossWinners.length + 1),
+              amount: getWinnings(
+                grossPayouts,
+                grossPlaced - 1,
+                grossWinners.length + 1,
+              ),
               place: grossPlaced,
               scoreType: ScoreType.GROSS,
             });
@@ -269,7 +321,8 @@ export function Calcutta() {
 
   const getPlaces = (scoreType: ScoreType, winners: CalcuttaWinner[]) => {
     const places: Place[] = [];
-    const availablePlaces = scoreType === ScoreType.NET ? netPayouts.length : grossPayouts.length;
+    const availablePlaces =
+      scoreType === ScoreType.NET ? netPayouts.length : grossPayouts.length;
     for (let place = 1; place <= availablePlaces; place++) {
       const filteredWinners = winners.filter(
         (winner) => winner.scoreType === scoreType && winner.place === place,
@@ -279,7 +332,9 @@ export function Calcutta() {
           number: place,
           score: filteredWinners[0].score,
           winnings: Math.floor(filteredWinners[0].amount),
-          winners: filteredWinners.map((winner) => `${winner.aPlayer} & ${winner.bPlayer}`),
+          winners: filteredWinners.map(
+            (winner) => `${winner.aPlayer} & ${winner.bPlayer}`,
+          ),
         });
       }
     }
@@ -348,9 +403,17 @@ export function Calcutta() {
           onChange={(day) => setTournamentDay(day as TournamentDay)}
         />
         <Group>
-          <PrizePoolInput labelId="calcuttaPrizePool" value={prizePool} onChange={setPrizePool} />
+          <PrizePoolInput
+            labelId="calcuttaPrizePool"
+            value={prizePool}
+            onChange={setPrizePool}
+          />
           <DownloadButton
-            disabled={isSample ? !calcuttaSampleQuery.isSuccess : !calcuttaQuery.isSuccess}
+            disabled={
+              isSample
+                ? !calcuttaSampleQuery.isSuccess
+                : !calcuttaQuery.isSuccess
+            }
             aria-label="Download calcutta"
             onClick={downloadCalcutta}
           />
@@ -362,13 +425,22 @@ export function Calcutta() {
             <SectionTitle>Results</SectionTitle>
             <Group gap="xl" align="flex-start">
               <Podium title="Net" places={getPlaces(ScoreType.NET, winners)} />
-              <Podium title="Gross" places={getPlaces(ScoreType.GROSS, winners)} />
+              <Podium
+                title="Gross"
+                places={getPlaces(ScoreType.GROSS, winners)}
+              />
             </Group>
           </Stack>
         )}
         <SectionTitle>Scores</SectionTitle>
-        <CalcuttaTable scoreType={ScoreType.NET} records={calcuttaTableData.net} />
-        <CalcuttaTable scoreType={ScoreType.GROSS} records={calcuttaTableData.gross} />
+        <CalcuttaTable
+          scoreType={ScoreType.NET}
+          records={calcuttaTableData.net}
+        />
+        <CalcuttaTable
+          scoreType={ScoreType.GROSS}
+          records={calcuttaTableData.gross}
+        />
       </Stack>
     </Stack>
   );

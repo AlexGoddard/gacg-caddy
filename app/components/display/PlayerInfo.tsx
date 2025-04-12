@@ -1,4 +1,12 @@
-import { Avatar, Badge, Group, GroupProps, Stack, Title, TitleOrder } from '@mantine/core';
+import {
+  Avatar,
+  Badge,
+  Group,
+  GroupProps,
+  Stack,
+  Title,
+  TitleOrder,
+} from '@mantine/core';
 
 import { Player } from 'hooks/players/model';
 

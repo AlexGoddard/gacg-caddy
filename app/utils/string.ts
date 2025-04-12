@@ -10,4 +10,5 @@ export const formatName = (value: string) => {
     .join(' ');
 };
 
-const capitalize = (value: string) => `${value[0].toUpperCase()}${value.slice(1)}`;
+const capitalize = (value: string) =>
+  `${value[0].toUpperCase()}${value.slice(1)}`;

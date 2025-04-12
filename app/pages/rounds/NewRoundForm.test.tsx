@@ -26,8 +26,12 @@ vi.mock('utils/date', () => ({
 }));
 
 const validateInitialValues = async () => {
-  expect(screen.getByRole('radio', { name: TournamentDay.FRIDAY })).toBeChecked();
-  expect(await screen.findByRole('textbox', { name: 'Player select' })).not.toHaveValue();
+  expect(
+    screen.getByRole('radio', { name: TournamentDay.FRIDAY }),
+  ).toBeChecked();
+  expect(
+    await screen.findByRole('textbox', { name: 'Player select' }),
+  ).not.toHaveValue();
 
   for (const hole of TEST_HOLES) {
     expect(
@@ -48,10 +52,14 @@ describe('new round form', () => {
     expect.assertions(20);
     renderWithWrapper(<NewRoundForm closeModal={() => undefined} />);
 
-    fireEvent.click(screen.getByRole('radio', { name: TournamentDay.SATURDAY }));
+    fireEvent.click(
+      screen.getByRole('radio', { name: TournamentDay.SATURDAY }),
+    );
 
     for (const hole of TEST_HOLES) {
-      const holeInput = await screen.findByRole('textbox', { name: hole.holeNumber.toString() });
+      const holeInput = await screen.findByRole('textbox', {
+        name: hole.holeNumber.toString(),
+      });
       fireEvent.change(holeInput, { target: { value: '1' } });
     }
 

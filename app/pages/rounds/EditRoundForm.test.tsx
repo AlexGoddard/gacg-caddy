@@ -23,13 +23,15 @@ vi.mock('hooks/players/usePlayers', () => ({
 
 const validateInitialValues = async () => {
   expect(screen.getByRole('radio', { name: TEST_ROUND.day })).toBeChecked();
-  expect(await screen.findByRole('textbox', { name: 'Player select' })).toHaveValue('Alex Goddard');
+  expect(
+    await screen.findByRole('textbox', { name: 'Player select' }),
+  ).toHaveValue('Alex Goddard');
 
   let currentHole = 1;
   for (const score of TEST_ROUND.grossHoles) {
-    expect(await screen.findByRole('textbox', { name: currentHole.toString() })).toHaveValue(
-      score.toString(),
-    );
+    expect(
+      await screen.findByRole('textbox', { name: currentHole.toString() }),
+    ).toHaveValue(score.toString());
     currentHole += 1;
   }
 };
@@ -37,21 +39,31 @@ const validateInitialValues = async () => {
 describe('edit round form', () => {
   it('renders with initial values set to match provided round', async () => {
     expect.assertions(20);
-    renderWithWrapper(<EditRoundForm round={TEST_ROUND} closeModal={() => undefined} />);
+    renderWithWrapper(
+      <EditRoundForm round={TEST_ROUND} closeModal={() => undefined} />,
+    );
 
     await validateInitialValues();
   });
 
   it('resets to initial values when reset is clicked', async () => {
     expect.assertions(20);
-    renderWithWrapper(<EditRoundForm round={TEST_ROUND} closeModal={() => undefined} />);
+    renderWithWrapper(
+      <EditRoundForm round={TEST_ROUND} closeModal={() => undefined} />,
+    );
 
-    fireEvent.click(screen.getByRole('radio', { name: TournamentDay.SATURDAY }));
+    fireEvent.click(
+      screen.getByRole('radio', { name: TournamentDay.SATURDAY }),
+    );
 
     let currentHole = 1;
     for (const score of TEST_ROUND.grossHoles) {
-      const holeInput = await screen.findByRole('textbox', { name: currentHole.toString() });
-      fireEvent.change(holeInput, { target: { value: (score + 1).toString() } });
+      const holeInput = await screen.findByRole('textbox', {
+        name: currentHole.toString(),
+      });
+      fireEvent.change(holeInput, {
+        target: { value: (score + 1).toString() },
+      });
       currentHole += 1;
     }
 

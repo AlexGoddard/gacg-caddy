@@ -51,7 +51,8 @@ export function PlayerForm(props: PlayerFormProps) {
     validate: {
       firstName: (value) => (value != '' ? null : 'First name is required'),
       lastName: (value) => (value != '' ? null : 'Last name is required'),
-      handicap: (value: string | number) => (value != '' ? null : 'Handicap is required'),
+      handicap: (value: string | number) =>
+        value != '' ? null : 'Handicap is required',
     },
 
     transformValues: (values) => ({
@@ -63,11 +64,18 @@ export function PlayerForm(props: PlayerFormProps) {
   });
 
   return (
-    <form onSubmit={form.onSubmit((values) => onSubmit(values))} onReset={form.onReset}>
+    <form
+      onSubmit={form.onSubmit((values) => onSubmit(values))}
+      onReset={form.onReset}
+    >
       <Stack {...otherProps}>
         <Fieldset legend="Player Information">
           <Stack>
-            <TextInput label="First Name" data-autofocus {...form.getInputProps('firstName')} />
+            <TextInput
+              label="First Name"
+              data-autofocus
+              {...form.getInputProps('firstName')}
+            />
             <TextInput label="Last Name" {...form.getInputProps('lastName')} />
             <Group justify="space-between" grow>
               <Select

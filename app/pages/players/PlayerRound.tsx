@@ -1,4 +1,12 @@
-import { Divider, Group, Paper, PaperProps, Stack, Text, Title } from '@mantine/core';
+import {
+  Divider,
+  Group,
+  Paper,
+  PaperProps,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 
 import { TournamentDay } from 'data/constants';
 
@@ -11,7 +19,10 @@ interface PlayerRoundProps extends PaperProps {
 
 export const PlayerRound = (props: PlayerRoundProps) => {
   const { day, playerId, ...otherProps } = props;
-  const { isPending, isSuccess, isError, error, data } = useRounds(day, playerId);
+  const { isPending, isSuccess, isError, error, data } = useRounds(
+    day,
+    playerId,
+  );
 
   return (
     <Stack gap="xxs" align="center">

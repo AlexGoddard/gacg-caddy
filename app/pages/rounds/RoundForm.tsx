@@ -81,7 +81,8 @@ export function RoundForm(props: RoundFormProps) {
     initialValues: initialValues,
 
     validate: {
-      playerId: (value: string | null) => (value != null ? null : 'Player is required'),
+      playerId: (value: string | null) =>
+        value != null ? null : 'Player is required',
       grossHoles: {
         score: (value: string | number) => (Number(value) > 0 ? null : true),
       },
@@ -110,7 +111,10 @@ export function RoundForm(props: RoundFormProps) {
   const selectedPlayer = form.getTransformedValues().player;
 
   return (
-    <form onSubmit={form.onSubmit((values) => onSubmit(values))} onReset={form.onReset}>
+    <form
+      onSubmit={form.onSubmit((values) => onSubmit(values))}
+      onReset={form.onReset}
+    >
       <Stack {...otherProps}>
         <DaySelector {...form.getInputProps('day')} />
         <Fieldset legend="Player Info">
@@ -122,8 +126,12 @@ export function RoundForm(props: RoundFormProps) {
             />
             {selectedPlayer && (
               <>
-                <Badge variant="filled">Division: {selectedPlayer.division}</Badge>
-                <Badge variant="filled">Handicap: {selectedPlayer.handicap}</Badge>
+                <Badge variant="filled">
+                  Division: {selectedPlayer.division}
+                </Badge>
+                <Badge variant="filled">
+                  Handicap: {selectedPlayer.handicap}
+                </Badge>
               </>
             )}
           </Group>
@@ -132,19 +140,26 @@ export function RoundForm(props: RoundFormProps) {
           <Fieldset legend="Hole Scores">
             {holesQuery.isSuccess && (
               <Group gap="lg" justify="space-around">
-                <SimpleGrid cols={{ base: 3, xs: 6, sm: 9, lg: 9 }} spacing="xs">
+                <SimpleGrid
+                  cols={{ base: 3, xs: 6, sm: 9, lg: 9 }}
+                  spacing="xs"
+                >
                   {holeInputs}
                 </SimpleGrid>
                 <Grid grow columns={2}>
                   <Grid.Col span={{ xs: 2, sm: 1, lg: 1 }}>
                     <SplitData
-                      topSection={getOut(form.getTransformedValues().grossHoles)}
+                      topSection={getOut(
+                        form.getTransformedValues().grossHoles,
+                      )}
                       bottomSection="Out"
                     />
                   </Grid.Col>
                   <Grid.Col span={{ xs: 2, sm: 1, lg: 1 }}>
                     <SplitData
-                      topSection={getGross(form.getTransformedValues().grossHoles)}
+                      topSection={getGross(
+                        form.getTransformedValues().grossHoles,
+                      )}
                       bottomSection="Gross"
                     />
                   </Grid.Col>
@@ -166,7 +181,9 @@ export function RoundForm(props: RoundFormProps) {
                 </Grid>
               </Group>
             )}
-            {holesQuery.isError && <Text c="blush">{holesQuery.error.message}</Text>}
+            {holesQuery.isError && (
+              <Text c="blush">{holesQuery.error.message}</Text>
+            )}
           </Fieldset>
         </Skeleton>
         <Group justify="flex-end">

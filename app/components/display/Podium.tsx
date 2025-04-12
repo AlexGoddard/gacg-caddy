@@ -1,4 +1,12 @@
-import { Group, GroupProps, Paper, Stack, StackProps, Text, Title } from '@mantine/core';
+import {
+  Group,
+  GroupProps,
+  Paper,
+  Stack,
+  StackProps,
+  Text,
+  Title,
+} from '@mantine/core';
 import { IconTrophy } from '@tabler/icons-react';
 
 import './style.less';
@@ -34,7 +42,11 @@ export const Podium = (props: PodiumProps) => {
         );
       case 2:
         return (
-          <IconTrophy size={iconSize} color="var(--mantine-color-snow-2)" className={trophyClass} />
+          <IconTrophy
+            size={iconSize}
+            color="var(--mantine-color-snow-2)"
+            className={trophyClass}
+          />
         );
       case 3:
         return (

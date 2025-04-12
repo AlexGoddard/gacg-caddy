@@ -14,5 +14,7 @@ export const useAvailablePlayers = (division: Division) =>
   });
 
 function fetchAvailablePartners(division: Division): Promise<Player[]> {
-  return get(`/${AVAILABLE_PLAYERS_PATH}`, { division: division }).then((players) => players);
+  return get(`/${AVAILABLE_PLAYERS_PATH}`, { division: division }).then(
+    (players) => players,
+  );
 }

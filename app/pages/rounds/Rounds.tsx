@@ -5,7 +5,10 @@ import { DataTable } from 'mantine-datatable';
 
 import { DownloadButton } from 'components/controls/Buttons';
 import { DaySelector } from 'components/controls/DaySelector';
-import { PlayerScorecard, PlayerScorecardData } from 'components/display/PlayerScorecard';
+import {
+  PlayerScorecard,
+  PlayerScorecardData,
+} from 'components/display/PlayerScorecard';
 import { Place, Podium } from 'components/display/Podium';
 import { SectionTitle } from 'components/display/typography/SectionTitle';
 import { NoRecordsFeedback } from 'components/feedback/NoRecordsFeedback';
@@ -46,11 +49,16 @@ export function Rounds() {
 
   const downloadRounds = () => {
     const fileName = `rounds-${tournamentDay}-${getTournamentYear()}.zip`;
-    const toDownload: NamedDownloadData[] = Object.values(ScoreType).map((scoreType) => ({
-      fileName: `${scoreType}.csv`,
-      headers: HEADERS,
-      rows: roundsTableData[scoreType].map((round) => [round.player, round.score.toString()]),
-    }));
+    const toDownload: NamedDownloadData[] = Object.values(ScoreType).map(
+      (scoreType) => ({
+        fileName: `${scoreType}.csv`,
+        headers: HEADERS,
+        rows: roundsTableData[scoreType].map((round) => [
+          round.player,
+          round.score.toString(),
+        ]),
+      }),
+    );
     downloadZip(fileName, toDownload);
   };
 
@@ -167,7 +175,10 @@ export function Rounds() {
           </Stack>
         )}
         <SectionTitle>Rounds</SectionTitle>
-        <RoundsTable scoreType={ScoreType.GROSS} records={roundsTableData.gross} />
+        <RoundsTable
+          scoreType={ScoreType.GROSS}
+          records={roundsTableData.gross}
+        />
         <RoundsTable scoreType={ScoreType.NET} records={roundsTableData.net} />
       </Stack>
     </Stack>

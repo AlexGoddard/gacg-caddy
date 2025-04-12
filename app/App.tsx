@@ -39,7 +39,11 @@ function App() {
             <Header toggle={toggle} />
           </AppShell.Header>
           <AppShell.Navbar>
-            <Navbar activeRoute={activeRoute} setActiveRoute={setActiveRoute} toggle={toggle} />
+            <Navbar
+              activeRoute={activeRoute}
+              setActiveRoute={setActiveRoute}
+              toggle={toggle}
+            />
           </AppShell.Navbar>
           <AppShell.Main>
             <Routes>

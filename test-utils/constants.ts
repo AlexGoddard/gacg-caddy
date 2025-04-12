@@ -16,7 +16,9 @@ export const TEST_PLAYER: Player = {
   handicap: 28,
 };
 
-export const TEST_SCORES = [4, 5, 7, 3, 4, 5, 4, 3, 4, 4, 3, 5, 3, 4, 3, 5, 3, 4];
+export const TEST_SCORES = [
+  4, 5, 7, 3, 4, 5, 4, 3, 4, 4, 3, 5, 3, 4, 3, 5, 3, 4,
+];
 
 export const TEST_ROUND: Round = {
   playerId: 1,

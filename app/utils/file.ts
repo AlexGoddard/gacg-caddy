@@ -10,13 +10,22 @@ export interface DownloadData {
 }
 
 export const downloadFile = (fileName: string, downloadData: DownloadData) => {
-  openSaveFileDialog(fileName, getDownloadBlob(downloadData.headers, downloadData.rows));
+  openSaveFileDialog(
+    fileName,
+    getDownloadBlob(downloadData.headers, downloadData.rows),
+  );
 };
 
-export const downloadZip = (fileName: string, toDownload: NamedDownloadData[]) => {
+export const downloadZip = (
+  fileName: string,
+  toDownload: NamedDownloadData[],
+) => {
   const zip = new JSZip();
   toDownload.map((downloadData) => {
-    zip.file(downloadData.fileName, getDownloadBlob(downloadData.headers, downloadData.rows));
+    zip.file(
+      downloadData.fileName,
+      getDownloadBlob(downloadData.headers, downloadData.rows),
+    );
   });
   zip.generateAsync({ type: 'blob' }).then((zippedFile) => {
     openSaveFileDialog(fileName, zippedFile);

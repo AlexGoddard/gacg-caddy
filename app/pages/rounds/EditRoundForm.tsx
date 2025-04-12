@@ -36,7 +36,10 @@ export function EditRoundForm(props: EditRoundFormProps) {
               closeModal();
               notifications.updateSuccess(loadingNotification, 'Updated round');
             } else {
-              notifications.updateFailure(loadingNotification, 'Failed to update round');
+              notifications.updateFailure(
+                loadingNotification,
+                'Failed to update round',
+              );
             }
           },
         },

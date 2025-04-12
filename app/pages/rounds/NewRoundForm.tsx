@@ -33,7 +33,10 @@ export function NewRoundForm(props: NewRoundProps) {
               closeModal();
               notifications.updateSuccess(loadingNotification, 'Saved round');
             } else {
-              notifications.updateFailure(loadingNotification, 'Failed to save round');
+              notifications.updateFailure(
+                loadingNotification,
+                'Failed to save round',
+              );
             }
           },
         },

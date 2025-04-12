@@ -12,7 +12,8 @@ export const useCalcuttaQuery = (day: TournamentDay) => ({
   queryFn: () => fetchCalcutta(day),
 });
 
-export const useCalcutta = (day: TournamentDay) => useQuery(useCalcuttaQuery(day));
+export const useCalcutta = (day: TournamentDay) =>
+  useQuery(useCalcuttaQuery(day));
 
 function fetchCalcutta(day: TournamentDay): Promise<CalcuttaTeamRound[]> {
   return get(`/${CALCUTTA_PATH}`, { day: day }).then((calcutta) => calcutta);

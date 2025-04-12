@@ -19,7 +19,9 @@ const ELIGIBLE_DAYS = [TournamentDay.FRIDAY, TournamentDay.SATURDAY];
 export function Payballs() {
   const currentTournamentDay = getTournamentDay();
   const [tournamentDay, setTournamentDay] = useState(
-    ELIGIBLE_DAYS.includes(currentTournamentDay) ? currentTournamentDay : TournamentDay.FRIDAY,
+    ELIGIBLE_DAYS.includes(currentTournamentDay)
+      ? currentTournamentDay
+      : TournamentDay.FRIDAY,
   );
   const [prizePool, setPrizePool] = useState<string | number>(200);
   const { isSuccess, data } = usePayballs(tournamentDay);
@@ -53,11 +55,13 @@ export function Payballs() {
 
   const downloadPayballs = () => {
     const fileName = `payballs-${tournamentDay}-${getTournamentYear()}.zip`;
-    const toDownload: NamedDownloadData[] = payballTableData.map((payballData) => ({
-      fileName: `${payballData.scoreType}.csv`,
-      headers: HEADERS,
-      rows: payballData.elementData.body,
-    }));
+    const toDownload: NamedDownloadData[] = payballTableData.map(
+      (payballData) => ({
+        fileName: `${payballData.scoreType}.csv`,
+        headers: HEADERS,
+        rows: payballData.elementData.body,
+      }),
+    );
     downloadZip(fileName, toDownload);
   };
 
@@ -84,8 +88,15 @@ export function Payballs() {
           onChange={(day) => setTournamentDay(day as TournamentDay)}
         />
         <Group>
-          <PrizePoolInput labelId="payballsPrizePool" value={prizePool} onChange={setPrizePool} />
-          <DownloadButton aria-label="Download payballs" onClick={downloadPayballs} />
+          <PrizePoolInput
+            labelId="payballsPrizePool"
+            value={prizePool}
+            onChange={setPrizePool}
+          />
+          <DownloadButton
+            aria-label="Download payballs"
+            onClick={downloadPayballs}
+          />
         </Group>
       </Group>
       <Group align="flex-start" justify="space-around">

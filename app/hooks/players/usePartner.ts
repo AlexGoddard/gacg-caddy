@@ -13,5 +13,7 @@ export const usePartner = (playerId: number) =>
   });
 
 function fetchPartner(playerId: number): Promise<Player> {
-  return get(`/${PARTNER_PATH}`, { playerId: playerId }).then((player) => player);
+  return get(`/${PARTNER_PATH}`, { playerId: playerId }).then(
+    (player) => player,
+  );
 }

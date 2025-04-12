@@ -13,7 +13,11 @@ export const PlayerSelect = (props: PlayerSelectProps) => {
     <Group gap="xs">
       <Select
         aria-label="Player select"
-        placeholder={playersQueryStatus === 'pending' ? 'Loading players..' : 'Search players..'}
+        placeholder={
+          playersQueryStatus === 'pending'
+            ? 'Loading players..'
+            : 'Search players..'
+        }
         disabled={playersQueryStatus !== 'success'}
         comboboxProps={{
           transitionProps: { transition: 'pop', duration: 300 },
@@ -24,7 +28,9 @@ export const PlayerSelect = (props: PlayerSelectProps) => {
         {...otherProps}
       />
       {playersQueryStatus === 'pending' && <Loader size="xs" />}
-      {playersQueryStatus === 'error' && <ErrorFeedback label={playersQueryError!.message} />}
+      {playersQueryStatus === 'error' && (
+        <ErrorFeedback label={playersQueryError!.message} />
+      )}
     </Group>
   );
 };

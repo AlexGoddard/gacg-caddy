@@ -1,5 +1,4 @@
 import { TournamentDay } from '../../app/data/constants';
-
 import { Division, ScoreType } from './constants';
 
 export interface CalcuttaTeam {

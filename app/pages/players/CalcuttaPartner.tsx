@@ -42,8 +42,10 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
   const focusTrapRef = useFocusTrap();
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>('');
   const [selectPartnerOpened, setSelectPartnerOpened] = useState(false);
-  const [removeConfirmOpened, { open: removeConfirmOpen, close: removeConfirmClose }] =
-    useDisclosure(false);
+  const [
+    removeConfirmOpened,
+    { open: removeConfirmOpen, close: removeConfirmClose },
+  ] = useDisclosure(false);
 
   const { isPending, isSuccess, isError, error, data } = usePartner(player.id);
 
@@ -53,8 +55,10 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
   const addPartner = () => {
     const loadingNotification = notifications.loading('Adding partner..');
 
-    const aPlayerId = player.division === Division.A ? player.id : Number(selectedPartnerId);
-    const bPlayerId = aPlayerId === player.id ? Number(selectedPartnerId) : player.id;
+    const aPlayerId =
+      player.division === Division.A ? player.id : Number(selectedPartnerId);
+    const bPlayerId =
+      aPlayerId === player.id ? Number(selectedPartnerId) : player.id;
 
     createTeamMutation.mutate(
       { aPlayerId: aPlayerId, bPlayerId: bPlayerId },
@@ -63,7 +67,10 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
           if (response) {
             notifications.updateSuccess(loadingNotification, 'Added partner');
           } else {
-            notifications.updateFailure(loadingNotification, 'Failed to add partner');
+            notifications.updateFailure(
+              loadingNotification,
+              'Failed to add partner',
+            );
           }
         },
       },
@@ -71,14 +78,19 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
   };
 
   const removePartner = () => {
-    const loadingNotification = notifications.loading('Removing Calcutta partner..');
+    const loadingNotification = notifications.loading(
+      'Removing Calcutta partner..',
+    );
 
     deleteTeamMutation.mutate(data!.id, {
       onSettled: (response) => {
         if (response) {
           notifications.updateSuccess(loadingNotification, 'Removed partner');
         } else {
-          notifications.updateFailure(loadingNotification, 'Failed to remove partner');
+          notifications.updateFailure(
+            loadingNotification,
+            'Failed to remove partner',
+          );
         }
       },
     });
@@ -101,7 +113,10 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
                 overlayProps={DEFAULT_OVERLAY}
               >
                 <Stack>
-                  <Text>Are you sure you want to remove Calcutta partner {data.fullName}?</Text>
+                  <Text>
+                    Are you sure you want to remove Calcutta partner{' '}
+                    {data.fullName}?
+                  </Text>
                   <Group justify="flex-end">
                     <Button variant="subtle" onClick={removeConfirmClose}>
                       Cancel
@@ -121,7 +136,10 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
                   c="dimmed"
                   variant="transparent"
                   onClick={removeConfirmOpen}
-                  classNames={{ root: 'removePartner', icon: 'removePartnerIcon' }}
+                  classNames={{
+                    root: 'removePartner',
+                    icon: 'removePartnerIcon',
+                  }}
                 >
                   <IconX />
                 </ActionIcon>
@@ -137,7 +155,9 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
               onChange={setSelectPartnerOpened}
             >
               <Popover.Target>
-                <Button onClick={() => setSelectPartnerOpened((opened) => !opened)}>
+                <Button
+                  onClick={() => setSelectPartnerOpened((opened) => !opened)}
+                >
                   Select Partner
                 </Button>
               </Popover.Target>
@@ -145,7 +165,9 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
                 <Stack>
                   <Title order={3}>Available Partners</Title>
                   <CalcuttaPartnerSelect
-                    division={player.division === Division.A ? Division.B : Division.A}
+                    division={
+                      player.division === Division.A ? Division.B : Division.A
+                    }
                     value={selectedPartnerId}
                     onChange={setSelectedPartnerId}
                     comboboxProps={{ withinPortal: false }}
@@ -175,7 +197,10 @@ export const CalcuttaPartnerSelect = (props: CalcuttaPartnerSelectProps) => {
 
   return (
     <PlayerSelect
-      data={players.map((player) => ({ value: player.id.toString(), label: player.fullName }))}
+      data={players.map((player) => ({
+        value: player.id.toString(),
+        label: player.fullName,
+      }))}
       playersQueryStatus={status}
       playersQueryError={error}
       {...otherProps}

@@ -1,6 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import path from 'node:path';
+import { BrowserWindow, app, ipcMain } from 'electron';
 import started from 'electron-squirrel-startup';
+import path from 'node:path';
 
 import * as dbm from './data/database-manager';
 

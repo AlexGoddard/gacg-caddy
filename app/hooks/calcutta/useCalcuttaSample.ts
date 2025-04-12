@@ -14,5 +14,7 @@ export const useCalcuttaSample = (isEnabled: boolean) =>
   useQuery(useCalcuttaSampleQuery(isEnabled));
 
 function fetchCalcuttaSample(): Promise<string[][]> {
-  return get(`/${CALCUTTA_SAMPLE_PATH}`).then((calcuttaSample) => calcuttaSample);
+  return get(`/${CALCUTTA_SAMPLE_PATH}`).then(
+    (calcuttaSample) => calcuttaSample,
+  );
 }

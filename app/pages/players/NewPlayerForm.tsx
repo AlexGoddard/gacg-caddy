@@ -28,7 +28,10 @@ export function NewPlayerForm(props: NewPlayerFormProps) {
           closeModal();
           notifications.updateSuccess(loadingNotification, 'Saved player');
         } else {
-          notifications.updateFailure(loadingNotification, 'Failed to save player');
+          notifications.updateFailure(
+            loadingNotification,
+            'Failed to save player',
+          );
         }
       },
     });

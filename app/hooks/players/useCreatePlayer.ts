@@ -18,5 +18,7 @@ export const useCreatePlayer = () => {
 };
 
 function createPlayer(newPlayer: FormPlayer): Promise<Player> {
-  return post(`/${PLAYERS_PATH}`, { player: newPlayer }).then((response) => response);
+  return post(`/${PLAYERS_PATH}`, { player: newPlayer }).then(
+    (response) => response,
+  );
 }

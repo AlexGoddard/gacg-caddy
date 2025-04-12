@@ -17,7 +17,10 @@ export const PrizePoolInput = (props: PrizePoolInputProps) => {
         placeholder="enter amount"
         size="md"
         leftSection={
-          <IconCurrencyDollar style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
+          <IconCurrencyDollar
+            style={{ width: rem(20), height: rem(20) }}
+            stroke={1.5}
+          />
         }
         min={1}
         clampBehavior="strict"

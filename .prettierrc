@@ -1,6 +1,7 @@
 {
-  "printWidth": 100,
   "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
   "importOrder": [
     "^(react|react-dom|react-router-dom)$",
     "<THIRD_PARTY_MODULES>",

@@ -40,12 +40,18 @@ export function Players() {
   const focusTrapRef = useFocusTrap();
 
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>('');
-  const [newPlayerFormOpened, { open: newPlayerFormOpen, close: newPlayerFormClose }] =
-    useDisclosure(false);
-  const [editPlayerFormOpened, { open: editPlayerFormOpen, close: editPlayerFormClose }] =
-    useDisclosure(false);
-  const [deleteConfirmOpened, { open: deleteConfirmOpen, close: deleteConfirmClose }] =
-    useDisclosure(false);
+  const [
+    newPlayerFormOpened,
+    { open: newPlayerFormOpen, close: newPlayerFormClose },
+  ] = useDisclosure(false);
+  const [
+    editPlayerFormOpened,
+    { open: editPlayerFormOpen, close: editPlayerFormClose },
+  ] = useDisclosure(false);
+  const [
+    deleteConfirmOpened,
+    { open: deleteConfirmOpen, close: deleteConfirmClose },
+  ] = useDisclosure(false);
 
   const { isMobile } = useDevice();
   const { isSuccess, data } = usePlayers();
@@ -53,7 +59,9 @@ export function Players() {
 
   const players = isSuccess ? data : [];
 
-  const selectedPlayer = players.find((player) => player.id === Number(selectedPlayerId));
+  const selectedPlayer = players.find(
+    (player) => player.id === Number(selectedPlayerId),
+  );
 
   const delPlayer = () => {
     const loadingNotification = notifications.loading('Deleting player..');
@@ -63,7 +71,10 @@ export function Players() {
         if (response) {
           notifications.updateSuccess(loadingNotification, 'Deleted player');
         } else {
-          notifications.updateFailure(loadingNotification, 'Failed to delete player');
+          notifications.updateFailure(
+            loadingNotification,
+            'Failed to delete player',
+          );
         }
       },
     });
@@ -93,7 +104,9 @@ export function Players() {
         <Menu.Label>Danger zone</Menu.Label>
         <Menu.Item
           color="red"
-          leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }} />}
+          leftSection={
+            <IconTrash style={{ width: rem(14), height: rem(14) }} />
+          }
           onClick={deleteConfirmOpen}
         >
           Delete player
@@ -112,7 +125,10 @@ export function Players() {
         fullScreen={isMobile}
         overlayProps={DEFAULT_OVERLAY}
       >
-        <NewPlayerForm closeModal={newPlayerFormClose} setActivePlayer={setSelectedPlayerId} />
+        <NewPlayerForm
+          closeModal={newPlayerFormClose}
+          setActivePlayer={setSelectedPlayerId}
+        />
       </Modal>
       <Modal
         opened={editPlayerFormOpened}
@@ -122,7 +138,10 @@ export function Players() {
         fullScreen={isMobile}
         overlayProps={DEFAULT_OVERLAY}
       >
-        <EditPlayerForm player={selectedPlayer!} closeModal={editPlayerFormClose} />
+        <EditPlayerForm
+          player={selectedPlayer!}
+          closeModal={editPlayerFormClose}
+        />
       </Modal>
       <Modal
         opened={deleteConfirmOpened}
@@ -133,8 +152,8 @@ export function Players() {
       >
         <Stack>
           <Text>
-            Are you sure you want to delete {selectedPlayer?.fullName}? Deleting players removes all
-            of their saved rounds.{' '}
+            Are you sure you want to delete {selectedPlayer?.fullName}? Deleting
+            players removes all of their saved rounds.{' '}
             <Text span c="blush.6" fw="bold">
               This action is irreversible
             </Text>
@@ -143,7 +162,11 @@ export function Players() {
             <Button variant="subtle" onClick={deleteConfirmClose}>
               Cancel
             </Button>
-            <Button color="blush.6" leftSection={<IconTrash size={14} />} onClick={delPlayer}>
+            <Button
+              color="blush.6"
+              leftSection={<IconTrash size={14} />}
+              onClick={delPlayer}
+            >
               Delete Player
             </Button>
           </Group>
@@ -180,9 +203,18 @@ export function Players() {
                   <Stack gap="xl">
                     <SectionTitle>Rounds</SectionTitle>
                     <Group align="flex-end">
-                      <PlayerRound day={TournamentDay.FRIDAY} playerId={selectedPlayer.id} />
-                      <PlayerRound day={TournamentDay.SATURDAY} playerId={selectedPlayer.id} />
-                      <PlayerRound day={TournamentDay.SUNDAY} playerId={selectedPlayer.id} />
+                      <PlayerRound
+                        day={TournamentDay.FRIDAY}
+                        playerId={selectedPlayer.id}
+                      />
+                      <PlayerRound
+                        day={TournamentDay.SATURDAY}
+                        playerId={selectedPlayer.id}
+                      />
+                      <PlayerRound
+                        day={TournamentDay.SUNDAY}
+                        playerId={selectedPlayer.id}
+                      />
                     </Group>
                   </Stack>
                 </Group>
@@ -215,7 +247,10 @@ export function Players() {
                         <PlayerScorecard
                           day={TournamentDay.ALL}
                           scoreType={ScoreType.GROSS}
-                          player={{ id: selectedPlayer.id, name: selectedPlayer.fullName }}
+                          player={{
+                            id: selectedPlayer.id,
+                            name: selectedPlayer.fullName,
+                          }}
                           fz="md"
                         />
                       </ScrollArea>
@@ -226,7 +261,10 @@ export function Players() {
                         <PlayerScorecard
                           day={TournamentDay.ALL}
                           scoreType={ScoreType.NET}
-                          player={{ id: selectedPlayer.id, name: selectedPlayer.fullName }}
+                          player={{
+                            id: selectedPlayer.id,
+                            name: selectedPlayer.fullName,
+                          }}
                           fz="md"
                         />
                       </ScrollArea>

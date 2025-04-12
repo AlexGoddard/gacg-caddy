@@ -8,10 +8,13 @@ export const useDeletePlayer = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (playerId: number) => deletePlayer(playerId),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: [PLAYERS_PATH] }),
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: [PLAYERS_PATH] }),
   });
 };
 
 function deletePlayer(playerId: number): Promise<boolean> {
-  return del(`/${PLAYERS_PATH}`, { playerId: playerId }).then((response) => response);
+  return del(`/${PLAYERS_PATH}`, { playerId: playerId }).then(
+    (response) => response,
+  );
 }

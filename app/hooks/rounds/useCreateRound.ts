@@ -18,5 +18,7 @@ export const useCreateRound = () => {
 };
 
 function createRound(newRound: Round): Promise<boolean> {
-  return post(`/${ROUNDS_PATH}`, { round: newRound }).then((response) => response);
+  return post(`/${ROUNDS_PATH}`, { round: newRound }).then(
+    (response) => response,
+  );
 }

@@ -18,5 +18,7 @@ export const useUpdateRound = () => {
 };
 
 function updateRound(editedRound: EditedRound): Promise<Round> {
-  return put(`/${ROUNDS_PATH}`, { round: editedRound }).then((response) => response);
+  return put(`/${ROUNDS_PATH}`, { round: editedRound }).then(
+    (response) => response,
+  );
 }

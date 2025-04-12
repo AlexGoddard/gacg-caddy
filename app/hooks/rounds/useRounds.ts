@@ -13,6 +13,11 @@ export const useRounds = (day: TournamentDay, playerId?: number) =>
     queryFn: () => fetchRounds(day, playerId),
   });
 
-function fetchRounds(day: TournamentDay, playerId?: number): Promise<PlayerRound[]> {
-  return get(`/${ROUNDS_PATH}`, { day: day, playerId: playerId }).then((rounds) => rounds);
+function fetchRounds(
+  day: TournamentDay,
+  playerId?: number,
+): Promise<PlayerRound[]> {
+  return get(`/${ROUNDS_PATH}`, { day: day, playerId: playerId }).then(
+    (rounds) => rounds,
+  );
 }

@@ -55,8 +55,10 @@ export const Scorecard = (props: ScorecardProps) => {
   const { rows, rowsQueryStatus, scoreType, ...otherProps } = props;
 
   const [selectedRound, setSelectedRound] = useState<Round>();
-  const [editRoundFormOpened, { open: editRoundFormOpen, close: editRoundFormClose }] =
-    useDisclosure(false);
+  const [
+    editRoundFormOpened,
+    { open: editRoundFormOpen, close: editRoundFormClose },
+  ] = useDisclosure(false);
 
   const { isMobile } = useDevice();
   const holesQuery = useHoles();
@@ -73,7 +75,9 @@ export const Scorecard = (props: ScorecardProps) => {
   };
   holes.map((hole, index) => {
     holeHeaders.numbers[index] = (
-      <Table.Td key={`hole-${hole.holeNumber}-number`}>{hole.holeNumber}</Table.Td>
+      <Table.Td key={`hole-${hole.holeNumber}-number`}>
+        {hole.holeNumber}
+      </Table.Td>
     );
     holeHeaders.pars[index] = (
       <Table.Td key={`hole-${hole.holeNumber}-par`} c="sage">
@@ -93,7 +97,9 @@ export const Scorecard = (props: ScorecardProps) => {
     const totalScore = sum(row.scores);
     const scoreElements = row.scores.map((holeScore, holeIndex) => (
       <Table.Td key={`${row.label}-hole-${holeIndex + 1}-score`}>
-        {row.playerId && teamScores && teamScores.scores[holeIndex] === holeScore ? (
+        {row.playerId &&
+        teamScores &&
+        teamScores.scores[holeIndex] === holeScore ? (
           <Indicator size={4} color="sage" zIndex={1}>
             {holeScore}
           </Indicator>

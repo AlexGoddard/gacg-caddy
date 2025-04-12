@@ -14,12 +14,18 @@ export const useCreateTeam = (initiatingPlayerId: number) => {
     mutationFn: (newCalcuttaTeam: { aPlayerId: number; bPlayerId: number }) =>
       createCalcuttaTeam(newCalcuttaTeam.aPlayerId, newCalcuttaTeam.bPlayerId),
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: [PARTNER_PATH, initiatingPlayerId] }),
+      queryClient.invalidateQueries({
+        queryKey: [PARTNER_PATH, initiatingPlayerId],
+      }),
   });
 };
 
-function createCalcuttaTeam(aPlayerId: number, bPlayerId: number): Promise<CalcuttaTeam> {
-  return post(`/${CALCUTTA_TEAMS_PATH}`, { aPlayerId: aPlayerId, bPlayerId: bPlayerId }).then(
-    (response) => response,
-  );
+function createCalcuttaTeam(
+  aPlayerId: number,
+  bPlayerId: number,
+): Promise<CalcuttaTeam> {
+  return post(`/${CALCUTTA_TEAMS_PATH}`, {
+    aPlayerId: aPlayerId,
+    bPlayerId: bPlayerId,
+  }).then((response) => response);
 }

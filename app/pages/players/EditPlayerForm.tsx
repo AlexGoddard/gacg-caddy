@@ -30,7 +30,10 @@ export function EditPlayerForm(props: EditPlayerFormProps) {
             closeModal();
             notifications.updateSuccess(loadingNotification, 'Updated player');
           } else {
-            notifications.updateFailure(loadingNotification, 'Failed to update player');
+            notifications.updateFailure(
+              loadingNotification,
+              'Failed to update player',
+            );
           }
         },
       },

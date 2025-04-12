@@ -15,7 +15,12 @@ export const DaySelector = (props: DaySelectorProps) => {
     <Chip.Group {...otherProps}>
       <Group justify="left">
         {availableDays.map((day) => (
-          <Chip variant="filled" value={day} tt="capitalize" key={`${day}-selector`}>
+          <Chip
+            variant="filled"
+            value={day}
+            tt="capitalize"
+            key={`${day}-selector`}
+          >
             {day}
           </Chip>
         ))}

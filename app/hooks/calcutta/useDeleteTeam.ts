@@ -11,10 +11,14 @@ export const useDeleteTeam = (initiatingPlayerId: number) => {
   return useMutation({
     mutationFn: (playerId: number) => deleteCalcuttaTeam(playerId),
     onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: [PARTNER_PATH, initiatingPlayerId] }),
+      queryClient.invalidateQueries({
+        queryKey: [PARTNER_PATH, initiatingPlayerId],
+      }),
   });
 };
 
 function deleteCalcuttaTeam(playerId: number): Promise<boolean> {
-  return del(`/${CALCUTTA_TEAMS_PATH}`, { playerId: playerId }).then((response) => response);
+  return del(`/${CALCUTTA_TEAMS_PATH}`, { playerId: playerId }).then(
+    (response) => response,
+  );
 }
