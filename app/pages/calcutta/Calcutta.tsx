@@ -126,14 +126,19 @@ export function Calcutta() {
       // Determine if each team could win more going gross
       possibleNetWinners.forEach((winner) => {
         const remainingGrossTeams = calcuttaTableData.gross.filter((possibleMatch) =>
-          winners.find((winning) => winning.aPlayer === possibleMatch.aPlayer) ? false : true,
+          grossWinners.find((grossWinner) => grossWinner.aPlayer === possibleMatch.aPlayer)
+            ? false
+            : true,
         );
         const winnerGrossScore = calcuttaTableData.gross.find(
           (possibleMatch) => possibleMatch.aPlayer === winner.aPlayer,
         )?.score;
         remainingGrossTeams
-          .slice(0, grossPayouts.length - grossPlaced)
+          .slice(0, grossPayouts.length - grossWinners.length)
           .forEach((remainingGrossTeam, index) => {
+            if (grossWinners.find((grossWinner) => grossWinner.aPlayer === winner.aPlayer)) {
+              return;
+            }
             if (remainingGrossTeam.score === winnerGrossScore) {
               const possibleGrossWinners = remainingGrossTeams.filter(
                 (possibleMatch) => possibleMatch.score === remainingGrossTeam.score,
@@ -147,7 +152,7 @@ export function Calcutta() {
                 grossPayouts,
                 // Add index to account for teams that will
                 // place gross higher than the current team
-                grossPlaced + index,
+                grossWinners.length,
                 possibleGrossWinners.length,
               );
               if (possibleGrossPlaceWinnings > possibleNetPlaceWinnings) {
@@ -195,19 +200,39 @@ export function Calcutta() {
         if (winners.find((winning) => winning.aPlayer === grossTeam.aPlayer)) continue;
         if (grossPlaced >= grossPayouts.length) break;
 
-        const grossWinners = calcuttaTableData.gross.filter(
+        const grossWinners = remainingGrossTeams.filter(
           (possibleMatch) => possibleMatch.score === grossTeam.score,
         );
         const grossWinnings = getWinnings(grossPayouts, grossPlaced, grossWinners.length);
-        grossWinners.map((winner) => {
-          winners.push({
-            aPlayer: winner.aPlayer,
-            bPlayer: winner.bPlayer,
-            score: winner.score,
-            amount: grossWinnings,
-            place: grossPlaced + 1,
-            scoreType: ScoreType.GROSS,
-          });
+        grossWinners.map((grossWinner) => {
+          if (
+            winners.find(
+              (winner) =>
+                winner.scoreType === ScoreType.GROSS && winner.score === grossWinner.score,
+            )
+          ) {
+            winners.find(
+              (winner) =>
+                winner.scoreType === ScoreType.GROSS && winner.score === grossWinner.score,
+            )!.amount = getWinnings(grossPayouts, grossPlaced - 1, grossWinners.length + 1);
+            winners.push({
+              aPlayer: grossWinner.aPlayer,
+              bPlayer: grossWinner.bPlayer,
+              score: grossWinner.score,
+              amount: getWinnings(grossPayouts, grossPlaced - 1, grossWinners.length + 1),
+              place: grossPlaced,
+              scoreType: ScoreType.GROSS,
+            });
+          } else {
+            winners.push({
+              aPlayer: grossWinner.aPlayer,
+              bPlayer: grossWinner.bPlayer,
+              score: grossWinner.score,
+              amount: grossWinnings,
+              place: grossPlaced + 1,
+              scoreType: ScoreType.GROSS,
+            });
+          }
         });
         grossPlaced += grossWinners.length;
       }
@@ -253,7 +278,7 @@ export function Calcutta() {
         places.push({
           number: place,
           score: filteredWinners[0].score,
-          winnings: Math.floor(filteredWinners[0].amount / 5) * 5,
+          winnings: Math.floor(filteredWinners[0].amount),
           winners: filteredWinners.map((winner) => `${winner.aPlayer} & ${winner.bPlayer}`),
         });
       }
