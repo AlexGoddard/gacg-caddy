@@ -1,8 +1,7 @@
-import { Division, TournamentDay } from 'data/constants';
-
-import { Hole } from 'hooks/holes/model';
-import { Player } from 'hooks/players/model';
-import { Round } from 'hooks/rounds/model';
+import { Division, TournamentDay } from '../app/data/constants';
+import { Hole } from '../app/hooks/holes/model';
+import { Player } from '../app/hooks/players/model';
+import { Round } from '../app/hooks/rounds/model';
 
 export const TEST_HOLES: Hole[] = new Array(18)
   .fill(0)

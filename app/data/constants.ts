@@ -13,4 +13,5 @@ export enum Division {
   B = 'b',
 }
 
-export const DATABASE_NAME = 'gacg.sqlite';
+export const DEFAULT_OVERLAY = { backgroundOpacity: 0.55, blur: 3 };
+export const PLACEHOLDER_SCORES = new Array(18).fill('');
