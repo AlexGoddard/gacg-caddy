@@ -121,7 +121,7 @@ export const Scorecard = (props: ScorecardProps) => {
                 size="sm"
                 onClick={() => {
                   setSelectedRound({
-                    playerId: row.playerId!,
+                    playerId: row.playerId,
                     day: row.day,
                     grossHoles: row.scores,
                   });
@@ -152,7 +152,7 @@ export const Scorecard = (props: ScorecardProps) => {
         fullScreen={isMobile}
         overlayProps={DEFAULT_OVERLAY}
       >
-        <EditRoundForm round={selectedRound!} closeModal={editRoundFormClose} />
+        <EditRoundForm round={selectedRound} closeModal={editRoundFormClose} />
       </Modal>
       <Box pos="relative">
         <LoadingOverlay

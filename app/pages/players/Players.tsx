@@ -139,7 +139,7 @@ export function Players() {
         overlayProps={DEFAULT_OVERLAY}
       >
         <EditPlayerForm
-          player={selectedPlayer!}
+          player={selectedPlayer}
           closeModal={editPlayerFormClose}
         />
       </Modal>

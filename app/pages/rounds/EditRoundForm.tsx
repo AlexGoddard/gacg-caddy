@@ -27,7 +27,7 @@ export function EditRoundForm(props: EditRoundFormProps) {
         {
           playerId: data.player.id,
           day: data.day,
-          previousDay: data.previousDay!,
+          previousDay: data.previousDay,
           grossHoles: data.grossHoles,
         },
         {

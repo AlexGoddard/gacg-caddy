@@ -82,7 +82,7 @@ export const CalcuttaPartner = (props: CalcuttaPartnerProps) => {
       'Removing Calcutta partner..',
     );
 
-    deleteTeamMutation.mutate(data!.id, {
+    deleteTeamMutation.mutate(data.id, {
       onSettled: (response) => {
         if (response) {
           notifications.updateSuccess(loadingNotification, 'Removed partner');

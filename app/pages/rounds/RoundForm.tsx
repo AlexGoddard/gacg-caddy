@@ -46,6 +46,17 @@ export interface RoundFormData {
   grossHoles: number[];
 }
 
+interface FormScore {
+  score: number;
+}
+
+interface FormInitialValues {
+  playerId: string | null;
+  day: TournamentDay;
+  previousDay: TournamentDay;
+  grossHoles: FormScore[];
+}
+
 interface RoundFormProps extends Omit<StackProps, 'onSubmit'> {
   round?: Round;
   onSubmit: (data: RoundFormData) => Promise<void>;
@@ -65,17 +76,17 @@ export function RoundForm(props: RoundFormProps) {
   const holes = holesQuery.isSuccess ? holesQuery.data : [];
 
   const initialValues = round
-    ? {
+    ? ({
         playerId: round.playerId.toString(),
         day: round.day,
         previousDay: round.day,
         grossHoles: round.grossHoles.map((hole) => ({ score: hole })),
-      }
-    : {
+      } as FormInitialValues)
+    : ({
         playerId: null,
         day: getTournamentDay(),
         grossHoles: new Array(18).fill({ score: '' }),
-      };
+      } as FormInitialValues);
 
   const form = useForm({
     initialValues: initialValues,

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
@@ -14,7 +14,7 @@ import { theme } from './theme';
 const root = document.getElementById('root');
 
 if (root) {
-  ReactDOM.createRoot(root).render(
+  createRoot(root).render(
     <React.StrictMode>
       <MantineProvider defaultColorScheme="dark" theme={theme}>
         <Notifications limit={3} />

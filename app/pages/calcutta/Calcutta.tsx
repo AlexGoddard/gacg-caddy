@@ -157,7 +157,7 @@ export function Calcutta() {
         )?.score;
         remainingGrossTeams
           .slice(0, grossPayouts.length - grossWinners.length)
-          .forEach((remainingGrossTeam, index) => {
+          .forEach((remainingGrossTeam) => {
             if (
               grossWinners.find(
                 (grossWinner) => grossWinner.aPlayer === winner.aPlayer,
@@ -247,18 +247,13 @@ export function Calcutta() {
           grossWinners.length,
         );
         grossWinners.map((grossWinner) => {
-          if (
-            winners.find(
-              (winner) =>
-                winner.scoreType === ScoreType.GROSS &&
-                winner.score === grossWinner.score,
-            )
-          ) {
-            winners.find(
-              (winner) =>
-                winner.scoreType === ScoreType.GROSS &&
-                winner.score === grossWinner.score,
-            )!.amount = getWinnings(
+          const tiedTeam = winners.find(
+            (winner) =>
+              winner.scoreType === ScoreType.GROSS &&
+              winner.score === grossWinner.score,
+          );
+          if (tiedTeam) {
+            tiedTeam.amount = getWinnings(
               grossPayouts,
               grossPlaced - 1,
               grossWinners.length + 1,

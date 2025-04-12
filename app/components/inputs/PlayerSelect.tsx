@@ -29,7 +29,7 @@ export const PlayerSelect = (props: PlayerSelectProps) => {
       />
       {playersQueryStatus === 'pending' && <Loader size="xs" />}
       {playersQueryStatus === 'error' && (
-        <ErrorFeedback label={playersQueryError!.message} />
+        <ErrorFeedback label={playersQueryError.message} />
       )}
     </Group>
   );
